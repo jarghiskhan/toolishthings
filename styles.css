@@ -1,0 +1,30 @@
+.exercise-item {
+    transition: all 0.3s ease;
+}
+
+.exercise-item:hover {
+    transform: translateX(5px);
+}
+
+.set-row {
+    transition: all 0.3s ease;
+}
+
+.set-row.completed {
+    background-color: #e8f5e9;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.weight-input, .reps-input {
+    width: 100px;
+}
+
+.complete-set {
+    width: 40px;
+}
+
+.exercise-details {
+    color: #666;
+    font-style: italic;
+}
