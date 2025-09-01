@@ -1,0 +1,113 @@
+/* Unified Color System for Toolish Things */
+/* Based on the color palette from the image */
+
+:root {
+    /* Primary Colors from Image */
+    --dark-slate-gray: #344642;
+    --hunyadi-yellow: #F6BD60;
+    --linen: #F7EDE2;
+    --tea-rose-red: #F5CAC3;
+    --cambridge-blue: #84A59D;
+    --light-coral: #F28482;
+
+    /* HSL versions for easier manipulation */
+    --dark-slate-gray-hsl: 167, 15%, 24%;
+    --hunyadi-yellow-hsl: 37, 89%, 67%;
+    --linen-hsl: 31, 57%, 93%;
+    --tea-rose-red-hsl: 8, 71%, 86%;
+    --cambridge-blue-hsl: 165, 15%, 58%;
+    --light-coral-hsl: 1, 81%, 73%;
+
+    /* Semantic Color Assignments */
+    --primary: var(--cambridge-blue);
+    --primary-hsl: var(--cambridge-blue-hsl);
+    --secondary: var(--hunyadi-yellow);
+    --secondary-hsl: var(--hunyadi-yellow-hsl);
+    --accent: var(--light-coral);
+    --accent-hsl: var(--light-coral-hsl);
+    --background: var(--linen);
+    --background-hsl: var(--linen-hsl);
+    --surface: white;
+    --text-primary: var(--dark-slate-gray);
+    --text-primary-hsl: var(--dark-slate-gray-hsl);
+    --text-secondary: #6c757d;
+    --text-muted: #495057;
+    --border: #e9ecef;
+    --border-light: #f8f9fa;
+
+    /* Status Colors */
+    --success: #28a745;
+    --warning: var(--hunyadi-yellow);
+    --danger: var(--light-coral);
+    --info: var(--cambridge-blue);
+
+    /* Gradients using the palette */
+    --gradient-primary: linear-gradient(135deg, var(--cambridge-blue) 0%, var(--dark-slate-gray) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--hunyadi-yellow) 0%, var(--light-coral) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--light-coral) 0%, var(--tea-rose-red) 100%);
+    --gradient-warm: linear-gradient(135deg, var(--hunyadi-yellow) 0%, var(--tea-rose-red) 100%);
+    --gradient-cool: linear-gradient(135deg, var(--cambridge-blue) 0%, var(--linen) 100%);
+    --gradient-soft: linear-gradient(135deg, var(--linen) 0%, var(--tea-rose-red) 100%);
+
+    /* Shadows using dark slate gray */
+    --shadow-sm: 0 2px 4px rgba(52, 70, 66, 0.1);
+    --shadow-md: 0 4px 8px rgba(52, 70, 66, 0.15);
+    --shadow-lg: 0 8px 16px rgba(52, 70, 66, 0.2);
+    --shadow-xl: 0 12px 24px rgba(52, 70, 66, 0.25);
+
+    /* Opacity variants */
+    --primary-10: hsla(var(--primary-hsl), 0.1);
+    --primary-20: hsla(var(--primary-hsl), 0.2);
+    --primary-50: hsla(var(--primary-hsl), 0.5);
+    --primary-80: hsla(var(--primary-hsl), 0.8);
+
+    --secondary-10: hsla(var(--secondary-hsl), 0.1);
+    --secondary-20: hsla(var(--secondary-hsl), 0.2);
+    --secondary-50: hsla(var(--secondary-hsl), 0.5);
+    --secondary-80: hsla(var(--secondary-hsl), 0.8);
+
+    --accent-10: hsla(var(--accent-hsl), 0.1);
+    --accent-20: hsla(var(--accent-hsl), 0.2);
+    --accent-50: hsla(var(--accent-hsl), 0.5);
+    --accent-80: hsla(var(--accent-hsl), 0.8);
+}
+
+/* Dark mode support (if needed in the future) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: var(--dark-slate-gray);
+        --surface: #2a3a36;
+        --text-primary: var(--linen);
+        --text-secondary: #adb5bd;
+        --text-muted: #6c757d;
+        --border: #495057;
+        --border-light: #343a40;
+    }
+}
+
+/* Utility classes for quick color application */
+.bg-primary { background-color: var(--primary) !important; }
+.bg-secondary { background-color: var(--secondary) !important; }
+.bg-accent { background-color: var(--accent) !important; }
+.bg-background { background-color: var(--background) !important; }
+.bg-surface { background-color: var(--surface) !important; }
+.bg-linen { background-color: var(--linen) !important; }
+.bg-tea-rose { background-color: var(--tea-rose-red) !important; }
+
+.text-primary { color: var(--primary) !important; }
+.text-secondary { color: var(--secondary) !important; }
+.text-accent { color: var(--accent) !important; }
+.text-background { color: var(--background) !important; }
+.text-dark-slate { color: var(--dark-slate-gray) !important; }
+
+.border-primary { border-color: var(--primary) !important; }
+.border-secondary { border-color: var(--secondary) !important; }
+.border-accent { border-color: var(--accent) !important; }
+
+/* Gradient utility classes */
+.gradient-primary { background: var(--gradient-primary) !important; }
+.gradient-secondary { background: var(--gradient-secondary) !important; }
+.gradient-accent { background: var(--gradient-accent) !important; }
+.gradient-warm { background: var(--gradient-warm) !important; }
+.gradient-cool { background: var(--gradient-cool) !important; }
+.gradient-soft { background: var(--gradient-soft) !important; }
