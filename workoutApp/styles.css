@@ -33,10 +33,10 @@
 }
 
 .set-row.completed {
-    background-color: #e8f5e9;
+    background-color: var(--primary-10);
     padding: 8px;
     border-radius: 6px;
-    border-left: 4px solid #4caf50;
+    border-left: 4px solid var(--primary);
 }
 
 /* Input styling for mobile */

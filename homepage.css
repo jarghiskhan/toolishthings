@@ -2,7 +2,7 @@
 
 /* Hero Section */
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-primary);
     color: white;
     position: relative;
     overflow: hidden;
@@ -43,23 +43,32 @@
 
 /* App Cards */
 .app-card {
-    background: white;
+    background: var(--surface);
     border-radius: 15px;
     padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     transition: all 0.3s ease;
     height: 100%;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.app-card h3 {
+    color: var(--text-primary);
+}
+
+.app-card p {
+    color: var(--text-secondary);
 }
 
 .app-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-xl);
 }
 
 .app-card.coming-soon {
     opacity: 0.8;
-    background: #f8f9fa;
+    background: var(--border-light);
 }
 
 .app-icon {
@@ -79,17 +88,26 @@
 
 /* Feature Cards */
 .feature-card {
-    background: white;
+    background: var(--surface);
     padding: 2rem 1.5rem;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-md);
     transition: all 0.3s ease;
     height: 100%;
+    color: var(--text-secondary);
+}
+
+.feature-card h4 {
+    color: var(--text-primary);
+}
+
+.feature-card p {
+    color: var(--text-secondary);
 }
 
 .feature-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-lg);
 }
 
 .feature-icon {
@@ -182,7 +200,7 @@ html {
 
 /* Footer Enhancements */
 footer {
-    border-top: 1px solid #343a40;
+    border-top: 1px solid var(--text-primary);
 }
 
 /* Animation for app cards on scroll */
