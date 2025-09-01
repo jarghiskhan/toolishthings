@@ -163,6 +163,16 @@ function renderWorkout() {
             workoutContainer.appendChild(exerciseElement);
         });
     });
+    
+    // Update the last exercise button text
+    const allExercises = workoutContainer.querySelectorAll('.exercise-item');
+    if (allExercises.length > 0) {
+        const lastExercise = allExercises[allExercises.length - 1];
+        const lastButton = lastExercise.querySelector('.next-exercise-btn');
+        if (lastButton) {
+            lastButton.innerHTML = '<i class="fas fa-check"></i> Complete Workout';
+        }
+    }
 }
 
 function createSetRow(setNumber) {
@@ -359,6 +369,43 @@ function showSettings() {
             break;
         default:
             alert('Invalid choice.');
+    }
+}
+
+function goToNextExercise(button) {
+    const currentExercise = button.closest('.exercise-item');
+    let nextExercise = currentExercise.nextElementSibling;
+    
+    // Skip over any non-exercise elements (like body part headers)
+    while (nextExercise && !nextExercise.classList.contains('exercise-item')) {
+        nextExercise = nextExercise.nextElementSibling;
+    }
+    
+    if (nextExercise && nextExercise.classList.contains('exercise-item')) {
+        // Scroll to the next exercise and position it at the top of the view
+        nextExercise.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+        
+        // Add a subtle highlight effect to the next exercise
+        nextExercise.style.transition = 'all 0.3s ease';
+        nextExercise.style.transform = 'scale(1.02)';
+        nextExercise.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+        
+        // Remove the highlight effect after a short delay
+        setTimeout(() => {
+            nextExercise.style.transform = 'scale(1)';
+            nextExercise.style.boxShadow = '';
+        }, 1000);
+    } else {
+        // If there's no next exercise, show a message or scroll to the top
+        alert('This is the last exercise! Great job completing your workout! 💪');
+        // Optionally scroll to the top of the workout container
+        document.getElementById('workout-container').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
     }
 }
 
