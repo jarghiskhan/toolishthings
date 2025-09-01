@@ -197,9 +197,12 @@ function markSetComplete(button) {
     } else {
         lastDoneSpan.textContent = 'Never';
     }
+
+    // Auto-save when a set is checkmarked
+    saveWorkout(false);
 }
 
-function saveWorkout() {
+function saveWorkout(showAlert = true) {
     const workoutDate = getTodayDate();
 
     // Get all exercises
@@ -267,7 +270,43 @@ function saveWorkout() {
     });
 
     localStorage.setItem('workoutHistory', JSON.stringify(workoutHistory));
-    alert('Workout progress saved!');
+    
+    // Only show alert if explicitly requested
+    if (showAlert) {
+        alert('Workout progress saved!');
+    }
+}
+
+function clearAllChecks() {
+    // Get all completed set rows
+    const completedSets = workoutContainer.querySelectorAll('.set-row.completed');
+    
+    if (completedSets.length === 0) {
+        alert('No completed sets to clear!');
+        return;
+    }
+    
+    // Clear all completed states
+    completedSets.forEach(setRow => {
+        setRow.classList.remove('completed');
+        const checkButton = setRow.querySelector('.complete-set');
+        checkButton.textContent = '✓';
+    });
+    
+    // Update last completed dates for all exercises
+    const exercises = workoutContainer.querySelectorAll('.exercise-item');
+    exercises.forEach(exercise => {
+        const hasCompletedSet = exercise.querySelector('.set-row.completed') !== null;
+        const lastDoneSpan = exercise.querySelector('.last-done');
+        if (!hasCompletedSet) {
+            lastDoneSpan.textContent = 'Never';
+        }
+    });
+    
+    // Save the cleared state
+    saveWorkout(false);
+    
+    alert('All checkmarks cleared! You can now do the exercises again.');
 }
 
 function exportData() {
@@ -282,6 +321,89 @@ function exportData() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+}
+
+// Navbar functionality
+function createNewApp() {
+    const appName = prompt('Enter the name for your new app:');
+    if (appName && appName.trim()) {
+        // Store the new app in localStorage
+        let apps = JSON.parse(localStorage.getItem('myApps')) || [];
+        const newApp = {
+            id: Date.now(),
+            name: appName.trim(),
+            type: 'custom',
+            created: new Date().toISOString(),
+            url: `#app-${Date.now()}`
+        };
+        apps.push(newApp);
+        localStorage.setItem('myApps', JSON.stringify(apps));
+        
+        alert(`App "${appName}" created successfully!`);
+        loadAppLinks();
+    }
+}
+
+function loadAppLinks() {
+    const appLinksContainer = document.getElementById('app-links');
+    const apps = JSON.parse(localStorage.getItem('myApps')) || [];
+    
+    // Keep the Workout Tracker link
+    appLinksContainer.innerHTML = `
+        <li class="nav-item">
+            <a class="nav-link active" href="#">Workout Tracker</a>
+        </li>
+    `;
+    
+    // Add created apps
+    apps.forEach(app => {
+        const appLink = document.createElement('li');
+        appLink.className = 'nav-item';
+        appLink.innerHTML = `
+            <a class="nav-link" href="${app.url}" title="Created: ${new Date(app.created).toLocaleDateString()}">
+                ${app.name}
+            </a>
+        `;
+        appLinksContainer.appendChild(appLink);
+    });
+}
+
+function showSettings() {
+    const settings = [
+        'Clear all workout data',
+        'Export all data',
+        'Reset personal records',
+        'About this app'
+    ];
+    
+    const choice = prompt(`Settings:\n\n${settings.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nEnter a number (1-4):`);
+    
+    switch(choice) {
+        case '1':
+            if (confirm('Are you sure you want to clear all workout data? This cannot be undone.')) {
+                localStorage.removeItem('workoutHistory');
+                localStorage.removeItem('personalRecords');
+                localStorage.removeItem('workoutDates');
+                alert('All workout data cleared!');
+                location.reload();
+            }
+            break;
+        case '2':
+            exportData();
+            break;
+        case '3':
+            if (confirm('Are you sure you want to reset all personal records? This cannot be undone.')) {
+                localStorage.removeItem('personalRecords');
+                alert('Personal records reset!');
+                location.reload();
+            }
+            break;
+        case '4':
+            alert('3-Day Full Body Workout Tracker\nVersion 1.0\n\nA simple, mobile-friendly workout tracking app.');
+            break;
+        default:
+            alert('Invalid choice.');
+    }
 }
 
 // Initialize with Day 1
