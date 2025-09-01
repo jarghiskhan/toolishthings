@@ -1,0 +1,119 @@
+/* Common Styles for Toolish Things */
+
+/* Navbar Styles */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.navbar-nav .nav-link {
+    transition: all 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    transform: translateY(-1px);
+}
+
+.navbar-nav .nav-link.active {
+    font-weight: 500;
+}
+
+/* Mobile Navbar Improvements */
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .navbar-nav .nav-link {
+        font-size: 14px;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .navbar-toggler {
+        border: none;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .navbar-toggler:focus {
+        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+    }
+}
+
+/* Common Button Styles */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Common Card Styles */
+.card {
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Common Form Styles */
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Common Spacing */
+.container {
+    max-width: 1200px;
+}
+
+/* Common Typography */
+.display-5 {
+    font-weight: 600;
+}
+
+.lead {
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+/* Common Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Common Focus States */
+.nav-link:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+
+/* Common Print Styles */
+@media print {
+    .navbar {
+        box-shadow: none !important;
+    }
+    
+    .btn {
+        display: none !important;
+    }
+}

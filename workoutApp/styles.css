@@ -1,0 +1,241 @@
+/* General mobile improvements */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    .display-5 {
+        font-size: 1.8rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Exercise item styling */
+.exercise-item {
+    transition: all 0.3s ease;
+}
+
+.exercise-item:hover {
+    transform: translateX(5px);
+}
+
+/* Set row styling */
+.set-row {
+    transition: all 0.3s ease;
+    margin-bottom: 0.75rem;
+}
+
+.set-row.completed {
+    background-color: #e8f5e9;
+    padding: 8px;
+    border-radius: 6px;
+    border-left: 4px solid #4caf50;
+}
+
+/* Input styling for mobile */
+.weight-input, .reps-input {
+    width: 100px;
+    min-height: 38px;
+}
+
+@media (max-width: 576px) {
+    .weight-input, .reps-input {
+        width: 80px;
+        font-size: 14px;
+    }
+    
+    .set-row {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .set-row .col-auto {
+        margin-bottom: 0.25rem;
+    }
+}
+
+/* Complete button styling */
+.complete-set {
+    width: 40px;
+    height: 38px;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.complete-set:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 576px) {
+    .complete-set {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+}
+
+/* Exercise details styling */
+.exercise-details {
+    color: #666;
+    font-style: italic;
+}
+
+/* Mobile-friendly button group */
+@media (max-width: 576px) {
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        border-radius: 6px !important;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-group .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Mobile-friendly exercise header */
+@media (max-width: 576px) {
+    .exercise-item .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+    }
+    
+    .exercise-variant {
+        width: 100% !important;
+        max-width: 200px;
+    }
+}
+
+/* Mobile-friendly personal records */
+@media (max-width: 576px) {
+    .personal-records {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    
+    .personal-records div {
+        margin-bottom: 0.25rem;
+    }
+}
+
+/* Mobile-friendly soreness/exertion section */
+@media (max-width: 576px) {
+    .mt-3 .row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .mt-3 .col-auto {
+        width: 100%;
+        text-align: left;
+    }
+    
+    .mt-3 .form-select {
+        width: 100%;
+        max-width: 150px;
+    }
+}
+
+/* Mobile-friendly action buttons */
+@media (max-width: 576px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch !important;
+    }
+    
+    .d-flex.justify-content-between > div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+    
+    .d-flex.justify-content-between .btn {
+        margin: 0 !important;
+        width: 100%;
+    }
+}
+
+/* Improved touch targets for mobile */
+@media (max-width: 576px) {
+    .btn {
+        min-height: 44px;
+        padding: 0.5rem 1rem;
+    }
+    
+    .form-control, .form-select {
+        min-height: 44px;
+    }
+}
+
+/* Better spacing for mobile */
+@media (max-width: 576px) {
+    .mb-4 {
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .mt-4 {
+        margin-top: 1.5rem !important;
+    }
+    
+    .mt-3 {
+        margin-top: 1rem !important;
+    }
+    
+    .mt-2 {
+        margin-top: 0.75rem !important;
+    }
+}
+
+/* Improved card shadows for mobile */
+@media (max-width: 576px) {
+    .card {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: none;
+    }
+    
+    .exercise-item .card {
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+}
+
+/* Better text readability on mobile */
+@media (max-width: 576px) {
+    body {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    h4 {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+    
+    h5 {
+        font-size: 1rem;
+    }
+}
+
+/* Improved form labels for mobile */
+@media (max-width: 576px) {
+    .col-form-label, .col-form-label-sm {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+}
+
+
