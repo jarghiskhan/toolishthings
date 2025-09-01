@@ -1,0 +1,236 @@
+/* Homepage Styles for Toolish Things */
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.tools-icon {
+    font-size: 8rem;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* App Cards */
+.app-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 1px solid #e9ecef;
+}
+
+.app-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.app-card.coming-soon {
+    opacity: 0.8;
+    background: #f8f9fa;
+}
+
+.app-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.app-features {
+    margin: 1rem 0;
+}
+
+.app-features .badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Feature Cards */
+.feature-card {
+    background: white;
+    padding: 2rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .hero-section .display-3 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-section .lead {
+        font-size: 1.1rem;
+    }
+    
+    .tools-icon {
+        font-size: 5rem;
+    }
+    
+    .app-card {
+        padding: 1.5rem;
+    }
+    
+    .feature-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .d-flex.gap-3 {
+        flex-direction: column;
+        gap: 1rem !important;
+    }
+    
+    .d-flex.gap-3 .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section .display-3 {
+        font-size: 2rem;
+    }
+    
+    .hero-section .lead {
+        font-size: 1rem;
+    }
+    
+    .tools-icon {
+        font-size: 4rem;
+    }
+    
+    .app-card {
+        padding: 1rem;
+    }
+    
+    .feature-card {
+        padding: 1rem;
+    }
+    
+    .display-5 {
+        font-size: 1.8rem;
+    }
+    
+    .container {
+        padding: 1rem;
+    }
+}
+
+/* Button Size Overrides */
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+
+/* Section Spacing */
+section {
+    position: relative;
+}
+
+section:not(:last-child) {
+    margin-bottom: 0;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+
+
+/* Footer Enhancements */
+footer {
+    border-top: 1px solid #343a40;
+}
+
+/* Animation for app cards on scroll */
+.app-card, .feature-card {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.app-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.feature-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.feature-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Hover effects for interactive elements */
+.app-card a:hover {
+    text-decoration: none;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+
+
+/* Print styles */
+@media print {
+    .hero-section {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .btn {
+        display: none !important;
+    }
+}
