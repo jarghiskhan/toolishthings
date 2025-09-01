@@ -29,16 +29,19 @@
     justify-content: center;
     align-items: center;
     height: 100%;
+    padding: 1rem 0;
 }
 
 .tools-icon {
     font-size: 8rem;
     animation: float 6s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
 }
 
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+    50% { transform: translateY(-10px); }
 }
 
 /* App Cards */
@@ -128,6 +131,10 @@
         font-size: 5rem;
     }
     
+    .hero-section .row {
+        padding-bottom: 0.5rem !important;
+    }
+    
     .app-card {
         padding: 1.5rem;
     }
@@ -157,6 +164,10 @@
     
     .tools-icon {
         font-size: 4rem;
+    }
+    
+    .hero-section .row {
+        padding-bottom: 0.25rem !important;
     }
     
     .app-card {
