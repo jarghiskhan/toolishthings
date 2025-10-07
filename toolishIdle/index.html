@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ToolishIdle - Retro Screensavers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/colors.css" rel="stylesheet">
+    <link href="../css/common.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div id="navbar-placeholder"></div>
+
+    <div class="container py-4">
+        <header class="pb-3 mb-4 border-bottom">
+            <h1 class="display-5 fw-bold">
+                <i class="fas fa-desktop"></i>
+                ToolishIdle - Retro Screensavers
+            </h1>
+            <p class="lead text-muted">Classic screensaver collection with 3D pipes, starfield, matrix rain, and bouncing logos</p>
+        </header>
+
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <div class="card mb-3" style="background: var(--surface);">
+                    <div class="card-body">
+                        <h5 class="card-title">Select Screensaver</h5>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary active" data-mode="pipes">
+                                <i class="fas fa-cube"></i>
+                                3D Pipes
+                            </button>
+                            <button class="btn btn-outline-primary" data-mode="starfield">
+                                <i class="fas fa-star"></i>
+                                Starfield
+                            </button>
+                            <button class="btn btn-outline-primary" data-mode="matrix">
+                                <i class="fas fa-terminal"></i>
+                                Matrix Rain
+                            </button>
+                            <button class="btn btn-outline-primary" data-mode="bouncing">
+                                <i class="fas fa-basketball-ball"></i>
+                                Bouncing Logo
+                            </button>
+                            <button class="btn btn-outline-primary" data-mode="drive">
+                                <i class="fas fa-car"></i>
+                                Endless Drive
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-3" style="background: var(--surface);">
+                    <div class="card-body">
+                        <h5 class="card-title">Speed Control</h5>
+                        <!-- Speed Controls -->
+                        <div id="pipesSpeedControl" style="display: none;">
+                            <label for="pipesSpeedSlider" class="form-label">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Pipes Speed
+                            </label>
+                            <input type="range" class="form-range" id="pipesSpeedSlider" min="1" max="10" value="1">
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>Slow</span>
+                                <span>Fast</span>
+                            </div>
+                        </div>
+                        
+                        <div id="starfieldSpeedControl" style="display: none;">
+                            <label for="starfieldSpeedSlider" class="form-label">
+                                <i class="fas fa-rocket"></i>
+                                Starfield Speed
+                            </label>
+                            <input type="range" class="form-range" id="starfieldSpeedSlider" min="1" max="10" value="1">
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>Slow</span>
+                                <span>Fast</span>
+                            </div>
+                        </div>
+                        
+                        <div id="matrixSpeedControl" style="display: none;">
+                            <label for="matrixSpeedSlider" class="form-label">
+                                <i class="fas fa-terminal"></i>
+                                Matrix Speed
+                            </label>
+                            <input type="range" class="form-range" id="matrixSpeedSlider" min="1" max="10" value="1">
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>Slow</span>
+                                <span>Fast</span>
+                            </div>
+                        </div>
+                        
+                        <div id="bouncingSpeedControl" style="display: none;">
+                            <label for="bouncingSpeedSlider" class="form-label">
+                                <i class="fas fa-basketball-ball"></i>
+                                Bounce Speed
+                            </label>
+                            <input type="range" class="form-range" id="bouncingSpeedSlider" min="1" max="10" value="1">
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>Slow</span>
+                                <span>Fast</span>
+                            </div>
+                        </div>
+                        
+                        <div id="driveSpeedControl" style="display: none;">
+                            <label for="driveSpeedSlider" class="form-label">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Drive Speed
+                            </label>
+                            <input type="range" class="form-range" id="driveSpeedSlider" min="1" max="10" value="1">
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>Slow</span>
+                                <span>Fast</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="background: var(--surface);">
+                    <div class="card-body">
+                        <h5 class="card-title">Actions</h5>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" id="fullscreenBtn">
+                                <i class="fas fa-expand"></i>
+                                Fullscreen
+                            </button>
+                            <button class="btn btn-outline-primary" id="retroToggle">
+                                <i class="fas fa-terminal"></i>
+                                Retro Mode
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9 mb-4">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="screensaver-container">
+                            <canvas id="canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const screensaverContainer = document.querySelector('.screensaver-container');
+        
+        function resizeCanvas() {
+            const container = screensaverContainer;
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        
+        resizeCanvas();
+        
+        window.addEventListener('resize', resizeCanvas);
+        
+        let currentMode = 'pipes';
+        let animationFrame;
+        let pipesSpeed = 1; // Default speed (slow)
+        let starfieldSpeed = 1;
+        let matrixSpeed = 1;
+        let bouncingSpeed = 1;
+        let driveSpeed = 1;
+        
+        // 3D PIPES SCREENSAVER
+        class Pipe {
+            constructor() {
+                // Spawn pipes across the entire screen
+                this.x = Math.random() * (canvas.width - 25);
+                this.y = Math.random() * (canvas.height - 25);
+                this.direction = Math.floor(Math.random() * 4);
+                this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+                this.segments = [];
+                this.length = 0;
+                this.maxLength = Math.min(50, maxSegmentsPerPipe);
+                this.isComplete = false;
+                this.age = 0; // Age of completed pipe
+            }
+            
+            update() {
+                if (this.length < this.maxLength) {
+                    // Much slower movement based on speed setting
+                    const moveInterval = Math.max(1, Math.floor(20 - (pipesSpeed * 1.8))); // 1-18 frames between moves
+                    
+                    if (pipeFrameCounter % moveInterval === 0) {
+                        const directions = [
+                            {dx: 30, dy: 0},
+                            {dx: -30, dy: 0},
+                            {dx: 0, dy: 30},
+                            {dx: 0, dy: -30}
+                        ];
+                        
+                        const dir = directions[this.direction];
+                        this.segments.push({x: this.x, y: this.y, dir: this.direction});
+                        this.x += dir.dx;
+                        this.y += dir.dy;
+                        this.length++;
+                        
+                        // Much slower direction changes
+                        if (Math.random() < 0.01) {
+                            this.direction = Math.floor(Math.random() * 4);
+                        }
+                        
+                        // Prevent pipes from going off screen - let them die instead
+                        if (this.x < 0 || this.x > canvas.width - 25 || this.y < 0 || this.y > canvas.height - 25) {
+                            return false; // Kill the pipe when it goes off screen
+                        }
+                    }
+                } else if (!this.isComplete) {
+                    // Mark pipe as complete when it reaches max length
+                    this.isComplete = true;
+                }
+                
+                // Age completed pipes
+                if (this.isComplete) {
+                    this.age++;
+                }
+                
+                return this.length < this.maxLength || this.age < 200; // Keep pipes for 200 frames after completion
+            }
+            
+            draw() {
+                // Limit segments to prevent memory issues
+                if (this.segments.length > maxSegmentsPerPipe) {
+                    this.segments = this.segments.slice(-maxSegmentsPerPipe);
+                }
+                
+                this.segments.forEach((seg, i) => {
+                    const alpha = i / this.segments.length;
+                    
+                    // Check if in fullscreen mode
+                    const isFullscreen = document.fullscreenElement || 
+                                        document.webkitFullscreenElement || 
+                                        document.mozFullScreenElement || 
+                                        document.msFullscreenElement;
+                    
+                    // If pipe is complete, age it faster in fullscreen
+                    if (this.isComplete) {
+                        const completionAge = this.age / 200; // 0 to 1 as pipe ages
+                        const greyThreshold = isFullscreen ? 0.1 : 0.3; // Faster aging in fullscreen
+                        
+                        if (completionAge > greyThreshold) {
+                            // Draw grey for completed pipes
+                            ctx.fillStyle = '#333';
+                            ctx.globalAlpha = Math.max(0.1, 1 - completionAge);
+                            ctx.fillRect(seg.x, seg.y, 25, 25);
+                        } else {
+                            // Draw fading color for recently completed pipes
+                            ctx.fillStyle = this.color;
+                            ctx.globalAlpha = alpha * (1 - completionAge);
+                            ctx.fillRect(seg.x, seg.y, 25, 25);
+                        }
+                    } else {
+                        // Draw grey trail boxes for older segments
+                        if (alpha < 0.3) {
+                            ctx.fillStyle = '#333';
+                            ctx.globalAlpha = 0.3;
+                            ctx.fillRect(seg.x, seg.y, 25, 25);
+                        } else if (alpha < 0.6) {
+                            // Transition zone - mix color with grey
+                            const greyMix = (0.6 - alpha) / 0.3; // 1.0 at alpha 0.3, 0.0 at alpha 0.6
+                            const colorMix = 1.0 - greyMix;
+                            
+                            // Draw grey background
+                            ctx.fillStyle = '#333';
+                            ctx.globalAlpha = 0.3 * greyMix;
+                            ctx.fillRect(seg.x, seg.y, 25, 25);
+                            
+                            // Draw colored overlay
+                            ctx.fillStyle = this.color;
+                            ctx.globalAlpha = alpha * colorMix;
+                            ctx.fillRect(seg.x, seg.y, 25, 25);
+                        } else {
+                            // Draw colored pipe segments for newer segments
+                            ctx.fillStyle = this.color;
+                            ctx.globalAlpha = alpha;
+                            ctx.fillRect(seg.x, seg.y, 25, 25);
+                        }
+                    }
+                    
+                    // Add border
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(seg.x, seg.y, 25, 25);
+                });
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        let pipes = [];
+        let pipeFrameCounter = 0;
+        let maxPipes = 10; // Limit total pipes to prevent memory issues
+        let maxSegmentsPerPipe = 100; // Limit segments per pipe
+        
+        function animatePipes() {
+            pipeFrameCounter++;
+            // Check if in fullscreen mode
+            const isFullscreen = document.fullscreenElement || 
+                                document.webkitFullscreenElement || 
+                                document.mozFullScreenElement || 
+                                document.msFullscreenElement;
+            
+            if (isFullscreen) {
+                // In fullscreen, use a more effective fade to ensure proper aging
+                const fadeSpeed = 0.008 + (pipesSpeed / 10) * 0.012; // More effective fade for fullscreen
+                ctx.fillStyle = `rgba(0, 0, 0, ${fadeSpeed})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                // Add subtle fade to create trail effect in windowed mode
+                const fadeSpeed = 0.005 + (pipesSpeed / 10) * 0.015; // Much slower fade
+                ctx.fillStyle = `rgba(0, 0, 0, ${fadeSpeed})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            // Much slower spawn rate with memory management
+            const spawnRate = 0.002 + (pipesSpeed / 10) * 0.008;
+            if (pipes.length < maxPipes && Math.random() < spawnRate) {
+                pipes.push(new Pipe());
+            }
+            
+            pipes = pipes.filter(pipe => pipe.update());
+            pipes.forEach(pipe => pipe.draw());
+            
+            // Periodic cleanup to prevent memory issues
+            if (pipeFrameCounter % 1000 === 0) { // Every 1000 frames
+                // Remove pipes that are too old or have too many segments
+                pipes = pipes.filter(pipe => {
+                    return pipe.length < maxSegmentsPerPipe && pipe.segments.length < maxSegmentsPerPipe;
+                });
+                
+                // Force garbage collection hint (if available)
+                if (window.gc) {
+                    window.gc();
+                }
+            }
+            
+            animationFrame = requestAnimationFrame(animatePipes);
+        }
+        
+        // STARFIELD SCREENSAVER
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width - canvas.width / 2;
+                this.y = Math.random() * canvas.height - canvas.height / 2;
+                this.z = Math.random() * canvas.width;
+            }
+            
+            update() {
+                // Adjust speed based on starfieldSpeed (1-10)
+                const speed = 2 + (starfieldSpeed / 10) * 8; // Range: 2-10
+                this.z -= speed;
+                if (this.z <= 0) {
+                    this.x = Math.random() * canvas.width - canvas.width / 2;
+                    this.y = Math.random() * canvas.height - canvas.height / 2;
+                    this.z = canvas.width;
+                }
+            }
+            
+            draw() {
+                const x = (this.x / this.z) * canvas.width + canvas.width / 2;
+                const y = (this.y / this.z) * canvas.height + canvas.height / 2;
+                const size = (1 - this.z / canvas.width) * 3;
+                const brightness = (1 - this.z / canvas.width);
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        let stars = Array(200).fill().map(() => new Star());
+        
+        function animateStarfield() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+            
+            animationFrame = requestAnimationFrame(animateStarfield);
+        }
+        
+        // MATRIX SCREENSAVER
+        const matrixChars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789';
+        let matrixColumns = [];
+        let columnCount;
+        
+        function initMatrix() {
+            columnCount = Math.floor(canvas.width / 20);
+            matrixColumns = Array(columnCount).fill().map(() => ({
+                y: Math.random() * canvas.height,
+                speed: Math.random() * 5 + 2
+            }));
+        }
+        
+        initMatrix();
+        
+        function animateMatrix() {
+            // Adjust fade speed based on matrixSpeed (1-10)
+            const fadeSpeed = 0.02 + (matrixSpeed / 10) * 0.08;
+            ctx.fillStyle = `rgba(0, 0, 0, ${fadeSpeed})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0f0';
+            ctx.font = '18px monospace';
+            
+            matrixColumns.forEach((col, i) => {
+                const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                const x = i * 20;
+                ctx.fillText(char, x, col.y);
+                
+                // Adjust speed based on matrixSpeed (1-10)
+                const speed = 1 + (matrixSpeed / 10) * 4; // Range: 1-5
+                col.y += speed;
+                if (col.y > canvas.height && Math.random() > 0.975) {
+                    col.y = 0;
+                }
+            });
+            
+            animationFrame = requestAnimationFrame(animateMatrix);
+        }
+        
+        // BOUNCING LOGO
+        class Logo {
+            constructor() {
+                this.width = 120;
+                this.height = 80;
+                this.x = Math.random() * (canvas.width - this.width);
+                this.y = Math.random() * (canvas.height - this.height);
+                this.dx = (Math.random() - 0.5) * 6;
+                this.dy = (Math.random() - 0.5) * 6;
+                this.hue = Math.random() * 360;
+            }
+            
+            update() {
+                // Adjust speed based on bouncingSpeed (1-10)
+                const speedMultiplier = 0.5 + (bouncingSpeed / 10) * 1.5; // Range: 0.5-2
+                this.x += this.dx * speedMultiplier;
+                this.y += this.dy * speedMultiplier;
+                
+                if (this.x <= 0 || this.x + this.width >= canvas.width) {
+                    this.dx *= -1;
+                    this.hue = Math.random() * 360;
+                }
+                if (this.y <= 0 || this.y + this.height >= canvas.height) {
+                    this.dy *= -1;
+                    this.hue = Math.random() * 360;
+                }
+            }
+            
+            draw() {
+                ctx.fillStyle = `hsl(${this.hue}, 80%, 60%)`;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('RETRO', this.x + this.width / 2, this.y + this.height / 2);
+            }
+        }
+        
+        let logo = new Logo();
+        
+        function animateBouncing() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            logo.update();
+            logo.draw();
+            
+            animationFrame = requestAnimationFrame(animateBouncing);
+        }
+        
+        // ENDLESS DRIVE SCREENSAVER
+        class DriveScreensaver {
+            constructor() {
+                this.roadY = canvas.height * 0.7;
+                this.roadWidth = canvas.width * 0.6;
+                this.carX = canvas.width / 2;
+                this.carY = canvas.height * 0.7 - 10; // Position car lower on the road
+                this.carWidth = 50; // Make car bigger
+                this.carHeight = 25; // Make car bigger
+                this.roadOffset = 0;
+                this.buildings = [];
+                this.stars = [];
+                this.initBuildings();
+                this.initStars();
+            }
+            
+            initBuildings() {
+                for (let i = 0; i < 20; i++) {
+                    this.buildings.push({
+                        x: i * 100,
+                        height: Math.random() * 200 + 100,
+                        color: this.getRandomSynthwaveColor(),
+                        width: 80 + Math.random() * 40
+                    });
+                }
+            }
+            
+            initStars() {
+                for (let i = 0; i < 100; i++) {
+                    this.stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height * 0.5,
+                        size: Math.random() * 2 + 1,
+                        brightness: Math.random()
+                    });
+                }
+            }
+            
+            getRandomSynthwaveColor() {
+                // Exclude car color (#ff0080) from building colors
+                const colors = ['#00ffff', '#ff00ff', '#8000ff', '#ff8000', '#00ff80', '#ff4080', '#4080ff', '#80ff40'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            
+            update() {
+                // Adjust speed based on driveSpeed (1-10)
+                const speed = 2 + (driveSpeed / 10) * 8; // Range: 2-10
+                this.roadOffset += speed;
+                
+                // Update building positions
+                this.buildings.forEach(building => {
+                    building.x -= speed;
+                    if (building.x < -building.width) {
+                        building.x = canvas.width + Math.random() * 200;
+                        building.height = Math.random() * 200 + 100;
+                        building.color = this.getRandomSynthwaveColor();
+                    }
+                });
+                
+                // Update star positions
+                this.stars.forEach(star => {
+                    star.x -= speed * 0.5;
+                    if (star.x < 0) {
+                        star.x = canvas.width;
+                        star.y = Math.random() * canvas.height * 0.5;
+                    }
+                });
+            }
+            
+            draw() {
+                // Draw synthwave sky gradient
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, '#0a0a2e');
+                gradient.addColorStop(0.5, '#16213e');
+                gradient.addColorStop(1, '#0f3460');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw stars
+                this.stars.forEach(star => {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                // Draw buildings
+                this.buildings.forEach(building => {
+                    // Building shadow
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    ctx.fillRect(building.x + 5, this.roadY, building.width, building.height);
+                    
+                    // Building main
+                    ctx.fillStyle = building.color;
+                    ctx.fillRect(building.x, this.roadY - building.height, building.width, building.height);
+                    
+                    // Building windows
+                    ctx.fillStyle = '#ffff00';
+                    for (let i = 0; i < 3; i++) {
+                        for (let j = 0; j < 5; j++) {
+                            if (Math.random() > 0.3) {
+                                ctx.fillRect(
+                                    building.x + 10 + i * 20,
+                                    this.roadY - building.height + 20 + j * 15,
+                                    8, 8
+                                );
+                            }
+                        }
+                    }
+                });
+                
+                // Draw road
+                ctx.fillStyle = '#333';
+                ctx.fillRect(0, this.roadY, canvas.width, canvas.height - this.roadY);
+                
+                // Draw road lines
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([20, 20]);
+                ctx.beginPath();
+                ctx.moveTo(0, this.roadY + 50);
+                ctx.lineTo(canvas.width, this.roadY + 50);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Draw car
+                this.drawCar();
+            }
+            
+            drawCar() {
+                // Car shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.fillRect(this.carX + 3, this.carY + 3, this.carWidth, this.carHeight);
+                
+                // Car body
+                ctx.fillStyle = '#ff0080';
+                ctx.fillRect(this.carX, this.carY, this.carWidth, this.carHeight);
+                
+                // Car windows
+                ctx.fillStyle = '#00ffff';
+                ctx.fillRect(this.carX + 5, this.carY + 2, this.carWidth - 10, this.carHeight - 4);
+                
+                // Car wheels
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(this.carX + 8, this.carY + this.carHeight, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(this.carX + this.carWidth - 8, this.carY + this.carHeight, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Car headlights
+                ctx.fillStyle = '#ffff00';
+                ctx.fillRect(this.carX + this.carWidth - 5, this.carY + 5, 3, 3);
+                ctx.fillRect(this.carX + this.carWidth - 5, this.carY + this.carHeight - 8, 3, 3);
+            }
+        }
+        
+        let driveScreensaver = new DriveScreensaver();
+        
+        function animateDrive() {
+            driveScreensaver.update();
+            driveScreensaver.draw();
+            
+            animationFrame = requestAnimationFrame(animateDrive);
+        }
+        
+        // MODE SWITCHING
+        function startMode(mode) {
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            currentMode = mode;
+            
+            switch(mode) {
+                case 'pipes':
+                    pipes = [];
+                    animatePipes();
+                    break;
+                case 'starfield':
+                    stars = Array(200).fill().map(() => new Star());
+                    animateStarfield();
+                    break;
+                case 'matrix':
+                    initMatrix();
+                    animateMatrix();
+                    break;
+                case 'bouncing':
+                    logo = new Logo();
+                    animateBouncing();
+                    break;
+                case 'drive':
+                    driveScreensaver = new DriveScreensaver();
+                    animateDrive();
+                    break;
+            }
+        }
+        
+        document.querySelectorAll('[data-mode]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                startMode(btn.dataset.mode);
+                
+                // Show/hide appropriate speed control
+                const pipesControl = document.getElementById('pipesSpeedControl');
+                const starfieldControl = document.getElementById('starfieldSpeedControl');
+                const matrixControl = document.getElementById('matrixSpeedControl');
+                const bouncingControl = document.getElementById('bouncingSpeedControl');
+                const driveControl = document.getElementById('driveSpeedControl');
+                
+                // Hide all controls first
+                pipesControl.style.display = 'none';
+                starfieldControl.style.display = 'none';
+                matrixControl.style.display = 'none';
+                bouncingControl.style.display = 'none';
+                driveControl.style.display = 'none';
+                
+                // Show the appropriate control
+                switch(btn.dataset.mode) {
+                    case 'pipes':
+                        pipesControl.style.display = 'block';
+                        break;
+                    case 'starfield':
+                        starfieldControl.style.display = 'block';
+                        break;
+                    case 'matrix':
+                        matrixControl.style.display = 'block';
+                        break;
+                    case 'bouncing':
+                        bouncingControl.style.display = 'block';
+                        break;
+                    case 'drive':
+                        driveControl.style.display = 'block';
+                        break;
+                }
+            });
+        });
+        
+        // Fullscreen functionality
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.webkitRequestFullscreen) {
+                canvas.webkitRequestFullscreen();
+            } else if (canvas.msRequestFullscreen) {
+                canvas.msRequestFullscreen();
+            }
+        });
+        
+        // Listen for fullscreen changes
+        document.addEventListener('fullscreenchange', () => {
+            if (currentMode === 'pipes') {
+                // Use more effective fade to ensure proper aging in fullscreen
+                const fadeSpeed = 0.008 + (pipesSpeed / 10) * 0.012;
+                ctx.fillStyle = `rgba(0, 0, 0, ${fadeSpeed})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        });
+        
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (currentMode === 'pipes') {
+                const fadeSpeed = 0.008 + (pipesSpeed / 10) * 0.012;
+                ctx.fillStyle = `rgba(0, 0, 0, ${fadeSpeed})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        });
+        
+        document.addEventListener('mozfullscreenchange', () => {
+            if (currentMode === 'pipes') {
+                const fadeSpeed = 0.008 + (pipesSpeed / 10) * 0.012;
+                ctx.fillStyle = `rgba(0, 0, 0, ${fadeSpeed})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        });
+        
+        document.addEventListener('MSFullscreenChange', () => {
+            if (currentMode === 'pipes') {
+                const fadeSpeed = 0.008 + (pipesSpeed / 10) * 0.012;
+                ctx.fillStyle = `rgba(0, 0, 0, ${fadeSpeed})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        });
+        
+        // Speed sliders
+        document.getElementById('pipesSpeedSlider').addEventListener('input', (e) => {
+            pipesSpeed = parseInt(e.target.value);
+        });
+        
+        document.getElementById('starfieldSpeedSlider').addEventListener('input', (e) => {
+            starfieldSpeed = parseInt(e.target.value);
+        });
+        
+        document.getElementById('matrixSpeedSlider').addEventListener('input', (e) => {
+            matrixSpeed = parseInt(e.target.value);
+        });
+        
+        document.getElementById('bouncingSpeedSlider').addEventListener('input', (e) => {
+            bouncingSpeed = parseInt(e.target.value);
+        });
+        
+        document.getElementById('driveSpeedSlider').addEventListener('input', (e) => {
+            driveSpeed = parseInt(e.target.value);
+        });
+        
+        // Retro mode toggle
+        let retroMode = false;
+        document.getElementById('retroToggle').addEventListener('click', () => {
+            retroMode = !retroMode;
+            document.body.classList.toggle('retro-mode', retroMode);
+            
+            const toggle = document.getElementById('retroToggle');
+            if (retroMode) {
+                toggle.innerHTML = '<i class="fas fa-desktop"></i> Modern Mode';
+                toggle.style.background = '#0f0';
+                toggle.style.color = '#000';
+            } else {
+                toggle.innerHTML = '<i class="fas fa-terminal"></i> Retro Mode';
+                toggle.style.background = 'var(--primary)';
+                toggle.style.color = 'white';
+            }
+        });
+        
+        startMode('pipes');
+        
+        // Show pipes speed control initially since pipes is the default mode
+        document.getElementById('pipesSpeedControl').style.display = 'block';
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/shared-navbar.js"></script>
+</body>
+</html>
