@@ -16,6 +16,12 @@ class SharedNavbar {
 
     async loadNavbar() {
         try {
+            // fetch() doesn't work with file:// protocol, use fallback directly
+            if (window.location.protocol === 'file:') {
+                this.loadFallbackNavbar();
+                return;
+            }
+            
             const basePath = this.getBasePath();
             const response = await fetch(`${basePath}navbar.html`);
             const navbarHtml = await response.text();
