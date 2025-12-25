@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rep Counter - Toolish Gains</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/colors.css" rel="stylesheet">
+    <link href="../../css/common.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div id="navbar-placeholder"></div>
+
+    <div class="container py-4">
+        <header class="pb-3 mb-4 border-bottom">
+            <h1 class="display-5 fw-bold">Rep Counter</h1>
+            <p class="lead mb-0">High-intensity metronome workout timer</p>
+        </header>
+
+        <!-- Input Panel -->
+        <div id="input-panel" class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Workout Settings</h5>
+                
+                <div class="row g-4">
+                    <!-- Tempo Input -->
+                    <div class="col-md-6">
+                        <label for="tempo-input" class="form-label fw-bold">
+                            <i class="fas fa-tachometer-alt me-2"></i>Tempo (BPM/Reps per minute)
+                        </label>
+                        <input type="range" class="form-range" id="tempo-input" min="60" max="200" value="150" step="1">
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="text-muted small">60 BPM</span>
+                            <span class="fw-bold fs-5" id="tempo-display">150</span>
+                            <span class="text-muted small">200 BPM</span>
+                        </div>
+                        <input type="number" class="form-control mt-2" id="tempo-number" min="60" max="200" value="150" placeholder="Enter tempo">
+                    </div>
+
+                    <!-- Duration Input -->
+                    <div class="col-md-6">
+                        <label for="duration-input" class="form-label fw-bold">
+                            <i class="fas fa-clock me-2"></i>Duration
+                        </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="duration-value" min="1" max="600" value="60" placeholder="Duration">
+                            <select class="form-select" id="duration-unit">
+                                <option value="seconds">Seconds</option>
+                                <option value="minutes" selected>Minutes</option>
+                            </select>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">Total duration: <span id="duration-display">1 minute</span></small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sound and Theme Options -->
+                <div class="row g-4 mt-2">
+                    <div class="col-md-6">
+                        <label for="sound-select" class="form-label fw-bold">
+                            <i class="fas fa-volume-up me-2"></i>Beat Sound
+                        </label>
+                        <select class="form-select" id="sound-select">
+                            <option value="click">Click</option>
+                            <option value="beep" selected>Beep</option>
+                            <option value="woodblock">Woodblock</option>
+                            <option value="tick">Tick</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="dark-mode-toggle">
+                            <label class="form-check-label fw-bold" for="dark-mode-toggle">
+                                <i class="fas fa-moon me-2"></i>Dark Mode
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="alert alert-info mt-4 mb-0" id="summary-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Total Reps:</strong> <span id="total-reps-display">150</span>
+                        </div>
+                        <button class="btn btn-primary btn-lg" id="start-btn">
+                            <i class="fas fa-play me-2"></i>Start Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workout Screen (Hidden Initially) -->
+        <div id="workout-screen" class="d-none">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <!-- Visual Beat Indicator -->
+                    <div class="beat-indicator-container mb-4">
+                        <div class="beat-circle" id="beat-circle"></div>
+                    </div>
+
+                    <!-- Rep Counters -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="rep-counter-card completed">
+                                <div class="rep-label">Reps Completed</div>
+                                <div class="rep-number" id="reps-completed">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="rep-counter-card remaining">
+                                <div class="rep-label">Reps Remaining</div>
+                                <div class="rep-number" id="reps-remaining">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timer and Progress -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-12">
+                            <div class="progress-container">
+                                <div class="progress-label mb-2">
+                                    <span>Time Remaining: <strong id="time-remaining">0:00</strong></span>
+                                </div>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                         id="progress-bar" 
+                                         role="progressbar" 
+                                         style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Control Buttons -->
+                    <div class="d-flex justify-content-center gap-3">
+                        <button class="btn btn-success btn-lg" id="pause-btn">
+                            <i class="fas fa-pause me-2"></i>Pause
+                        </button>
+                        <button class="btn btn-danger btn-lg" id="stop-btn">
+                            <i class="fas fa-stop me-2"></i>Stop
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+    <script src="../../js/shared-navbar.js"></script>
+</body>
+</html>
+
