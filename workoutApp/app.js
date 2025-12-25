@@ -34,6 +34,7 @@ function formatWorkoutDates(dates) {
 
 function updateLastCompletedDate() {
     const lastCompletedSpan = document.getElementById('last-completed-date');
+    if (!lastCompletedSpan) return; // Element may not exist in current UI
     const dayDates = workoutDates[`day${currentDay}`] || [];
     lastCompletedSpan.textContent = formatWorkoutDates(dayDates);
 }
