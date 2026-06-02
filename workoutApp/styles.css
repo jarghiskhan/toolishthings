@@ -553,4 +553,62 @@ header.pb-3.mb-4.border-bottom h1::before {
     color: var(--dark-slate-gray) !important;
 }
 
+/* Program tabs */
+.program-tabs .nav-link {
+    font-weight: 600;
+    color: var(--dark-slate-gray, #333);
+}
+
+.program-tabs .nav-link.active {
+    color: var(--primary, #0d6efd);
+}
+
+#session-buttons.flex-wrap .btn {
+    flex: 1 1 auto;
+    min-width: 4.5rem;
+}
+
+#session-buttons .btn.active {
+    font-weight: 600;
+}
+
+.warmup-timer-display {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+}
+
+.timed-set-row .timer-countdown {
+    min-width: 3.5rem;
+}
+
+.set-row.completed {
+    opacity: 0.85;
+}
+
+.set-row.completed .timer-countdown {
+    background-color: var(--success, #198754) !important;
+}
+
+.timer-flash-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    background: transparent;
+}
+
+.timer-flash-overlay.active {
+    animation: timerFlash 2.5s ease-out forwards;
+}
+
+@keyframes timerFlash {
+    0% { opacity: 0; background: rgba(255, 255, 255, 0); }
+    15% { opacity: 1; background: rgba(255, 220, 100, 0.95); }
+    30% { opacity: 0.3; background: rgba(255, 100, 100, 0.7); }
+    45% { opacity: 1; background: rgba(255, 255, 255, 0.95); }
+    60% { opacity: 0.4; background: rgba(255, 180, 80, 0.8); }
+    100% { opacity: 0; background: rgba(255, 255, 255, 0); }
+}
+
 
