@@ -203,6 +203,13 @@ class ProgramBuilderApp {
         this.selectedFieldId = field.id;
         this.scheduleSave();
         this.render();
+
+        if (type === 'text') {
+            const textarea = this.fieldEditors.querySelector(
+                `.field-editor[data-field-id="${field.id}"] textarea`
+            );
+            if (textarea) textarea.focus();
+        }
     }
 
     deleteField(fieldId) {
@@ -216,14 +223,27 @@ class ProgramBuilderApp {
         this.render();
     }
 
-    selectField(fieldId) {
+    selectField(fieldId, { focusTextarea = false } = {}) {
+        const wasSelected = this.selectedFieldId === fieldId;
         this.selectedFieldId = fieldId;
         this.renderCanvas();
+
+        if (wasSelected) {
+            this.fieldEditors.querySelectorAll('.field-editor').forEach(el => {
+                el.classList.toggle('selected', el.dataset.fieldId === fieldId);
+            });
+            return;
+        }
+
         this.renderFieldEditors();
 
-        const editor = document.querySelector(`[data-field-id="${fieldId}"]`);
+        const editor = this.fieldEditors.querySelector(`.field-editor[data-field-id="${fieldId}"]`);
         if (editor) {
             editor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            if (focusTextarea) {
+                const textarea = editor.querySelector('textarea');
+                if (textarea) textarea.focus();
+            }
         }
     }
 
@@ -376,7 +396,10 @@ class ProgramBuilderApp {
                 textarea.addEventListener('input', (e) => {
                     this.updateField(field.id, { content: e.target.value });
                 });
-                textarea.addEventListener('focus', () => this.selectField(field.id));
+                textarea.addEventListener('focus', () => {
+                    this.selectField(field.id, { focusTextarea: true });
+                });
+                textarea.addEventListener('click', (e) => e.stopPropagation());
                 editor.appendChild(textarea);
 
                 const styleRow = document.createElement('div');
@@ -403,6 +426,7 @@ class ProgramBuilderApp {
                 textAlignSelect.addEventListener('change', (e) => {
                     this.updateField(field.id, { textAlign: e.target.value });
                 });
+                styleRow.addEventListener('click', (e) => e.stopPropagation());
                 editor.appendChild(styleRow);
             } else {
                 const fileLabel = document.createElement('label');
@@ -418,6 +442,7 @@ class ProgramBuilderApp {
                 fileInput.accept = 'image/*';
                 fileInput.addEventListener('change', (e) => this.handleImageUpload(field.id, e.target.files[0]));
                 fileInput.addEventListener('focus', () => this.selectField(field.id));
+                fileInput.addEventListener('click', (e) => e.stopPropagation());
                 editor.appendChild(fileInput);
 
                 if (field.content) {
@@ -433,12 +458,16 @@ class ProgramBuilderApp {
             deleteBtn.type = 'button';
             deleteBtn.className = 'btn btn-outline-danger btn-sm w-100 mt-2';
             deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Remove field';
-            deleteBtn.addEventListener('click', () => {
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 if (confirm(`Remove field ${field.label}?`)) this.deleteField(field.id);
             });
             editor.appendChild(deleteBtn);
 
-            editor.addEventListener('click', () => this.selectField(field.id));
+            editor.addEventListener('click', (e) => {
+                if (e.target.closest('textarea, input, select, button')) return;
+                this.selectField(field.id);
+            });
             this.fieldEditors.appendChild(editor);
         });
 
