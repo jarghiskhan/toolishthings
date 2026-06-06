@@ -7,10 +7,11 @@ class SharedNavbar {
 
     getCurrentPage() {
         const path = window.location.pathname;
-        if (path === '/' || path.endsWith('/index.html') || path.endsWith('index.html')) return 'home';
         if (path.includes('workoutApp')) return 'workout';
         if (path.includes('toolishQuest')) return 'toolishquest';
         if (path.includes('toolishIdle')) return 'toolishidle';
+        if (path.includes('programBuilder')) return 'programbuilder';
+        if (path === '/' || path.endsWith('/index.html') || path.endsWith('index.html')) return 'home';
         return 'home';
     }
 
@@ -47,11 +48,13 @@ class SharedNavbar {
             if (href) {
                 // Fix paths that are relative to root
                 if (href === 'index.html' || href.startsWith('workoutApp/') || 
-                    href.startsWith('toolishQuest/') || href.startsWith('toolishIdle/')) {
+                    href.startsWith('toolishQuest/') || href.startsWith('toolishIdle/') ||
+                    href.startsWith('programBuilder/')) {
                     link.setAttribute('href', basePath + href);
                 }
                 // Also handle cases where href ends with / and needs index.html
-                if (href.endsWith('/workoutApp/') || href.endsWith('/toolishQuest/') || href.endsWith('/toolishIdle/')) {
+                if (href.endsWith('/workoutApp/') || href.endsWith('/toolishQuest/') || href.endsWith('/toolishIdle/') ||
+                    href.endsWith('/programBuilder/')) {
                     link.setAttribute('href', href.replace(/\/$/, '/index.html'));
                 }
             }
@@ -78,6 +81,9 @@ class SharedNavbar {
                                 <a class="nav-link" href="${basePath}toolishQuest/index.html">Toolish Quest</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="${basePath}programBuilder/index.html">Toolish Programs</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="${basePath}toolishIdle/index.html">ToolishIdle</a>
                             </li>
                         </ul>
@@ -95,7 +101,8 @@ class SharedNavbar {
     getBasePath() {
         const path = window.location.pathname;
         // If we're in a subdirectory, go up one level
-        if (path.includes('/workoutApp/') || path.includes('/toolishQuest/') || path.includes('/toolishIdle/')) {
+        if (path.includes('/workoutApp/') || path.includes('/toolishQuest/') || path.includes('/toolishIdle/') ||
+            path.includes('/programBuilder/')) {
             return '../';
         }
         // If we're at the root, no prefix needed
@@ -115,6 +122,8 @@ class SharedNavbar {
             } else if (this.currentPage === 'toolishquest' && (href.includes('toolishQuest') || href.includes('toolishQuest/'))) {
                 link.classList.add('active');
             } else if (this.currentPage === 'toolishidle' && (href.includes('toolishIdle') || href.includes('toolishIdle/'))) {
+                link.classList.add('active');
+            } else if (this.currentPage === 'programbuilder' && (href.includes('programBuilder') || href.includes('programBuilder/'))) {
                 link.classList.add('active');
             }
         });

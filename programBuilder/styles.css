@@ -1,0 +1,362 @@
+body {
+    background: var(--background);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+}
+
+.editor-layout {
+    display: flex;
+    height: calc(100vh - 56px);
+}
+
+.editor-sidebar {
+    width: 300px;
+    min-width: 300px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 1rem 1rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.sidebar-title i {
+    color: var(--primary);
+    margin-right: 0.35rem;
+}
+
+.sidebar-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0;
+}
+
+.sidebar-section {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.project-controls {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.project-controls .form-select {
+    flex: 1;
+}
+
+.field-editors {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+}
+
+.add-field-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.add-field-buttons .btn {
+    flex: 1;
+}
+
+.placement-hint {
+    font-size: 0.8rem;
+    color: var(--primary);
+    margin: 0.5rem 0 0;
+    font-style: italic;
+}
+
+.empty-fields-msg {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.field-editor {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.field-editor.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px hsla(var(--primary-hsl), 0.25);
+}
+
+.field-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.field-label-badge {
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: var(--primary);
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+}
+
+.field-type-tag {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.field-editor .form-label {
+    font-size: 0.75rem;
+    margin-bottom: 0.2rem;
+    color: var(--text-secondary);
+}
+
+.field-editor textarea {
+    font-size: 0.85rem;
+    resize: vertical;
+    min-height: 60px;
+}
+
+.field-style-row {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+}
+
+.field-style-row .form-select,
+.field-style-row .form-control {
+    font-size: 0.8rem;
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 80px;
+    object-fit: contain;
+    margin-top: 0.35rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.editor-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    flex-shrink: 0;
+}
+
+.save-status {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.save-status.saving {
+    color: var(--warning);
+}
+
+.canvas-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    padding: 0.5rem;
+}
+
+.program-canvas {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    aspect-ratio: 11 / 8.5;
+    background: white;
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
+    border: 1px solid #ccc;
+    cursor: default;
+}
+
+.program-canvas.placement-mode {
+    cursor: crosshair;
+}
+
+.canvas-fold-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0;
+    height: 100%;
+    border-left: 2px dashed #bbb;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.canvas-fields {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+
+.canvas-field {
+    position: absolute;
+    box-sizing: border-box;
+    cursor: move;
+    user-select: none;
+    border: 1px dashed transparent;
+    padding: 2px;
+    overflow: hidden;
+}
+
+.canvas-field:hover {
+    border-color: hsla(var(--primary-hsl), 0.5);
+}
+
+.canvas-field.selected {
+    border-color: var(--primary);
+    background: hsla(var(--primary-hsl), 0.05);
+}
+
+.canvas-field .field-label-tag {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    font-size: 9px;
+    background: var(--primary);
+    color: white;
+    padding: 1px 4px;
+    border-radius: 0 0 4px 0;
+    line-height: 1.2;
+    pointer-events: none;
+}
+
+.canvas-field-text {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    word-break: break-word;
+    white-space: pre-wrap;
+    overflow: hidden;
+}
+
+.canvas-field-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.canvas-field-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 0.75rem;
+    background: #f8f8f8;
+}
+
+@media (max-width: 768px) {
+    .editor-layout {
+        flex-direction: column;
+        height: auto;
+        min-height: calc(100vh - 56px);
+    }
+
+    .editor-sidebar {
+        width: 100%;
+        min-width: unset;
+        max-height: 45vh;
+    }
+
+    body {
+        overflow: auto;
+        height: auto;
+    }
+}
+
+@media print {
+    @page {
+        size: letter landscape;
+        margin: 0.5in;
+    }
+
+    body {
+        background: white;
+        overflow: visible;
+        height: auto;
+    }
+
+    #navbar-placeholder,
+    .editor-sidebar,
+    .editor-toolbar,
+    .navbar {
+        display: none !important;
+    }
+
+    .editor-layout {
+        display: block;
+        height: auto;
+    }
+
+    .editor-main {
+        padding: 0;
+        display: block;
+    }
+
+    .canvas-wrapper {
+        padding: 0;
+        overflow: visible;
+        display: block;
+    }
+
+    .program-canvas {
+        max-width: none;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        aspect-ratio: unset;
+        height: auto;
+        min-height: 6.5in;
+        page-break-inside: avoid;
+    }
+
+    .canvas-fold-line {
+        border-left-color: #999;
+        border-left-width: 1px;
+    }
+
+    .canvas-field {
+        border: none !important;
+        background: transparent !important;
+    }
+
+    .canvas-field .field-label-tag {
+        display: none;
+    }
+}
