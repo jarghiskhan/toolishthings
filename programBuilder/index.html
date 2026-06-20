@@ -36,6 +36,13 @@
                 </div>
                 <label class="form-label mt-2" for="projectName">Program name</label>
                 <input type="text" id="projectName" class="form-control form-control-sm" placeholder="Sunday Service">
+                <label class="form-label mt-2" for="globalFontFamily">Global font</label>
+                <select id="globalFontFamily" class="form-select form-select-sm"></select>
+                <label class="form-label mt-2" for="globalTextColorHex">Global text color</label>
+                <div class="global-color-row">
+                    <input type="color" id="globalTextColorPicker" class="form-control form-control-color" value="#344642" title="Pick global text color">
+                    <input type="text" id="globalTextColorHex" class="form-control form-control-sm" placeholder="#344642" maxlength="7" spellcheck="false">
+                </div>
             </section>
 
             <section class="sidebar-section">
@@ -46,6 +53,33 @@
                     <button type="button" id="addImageBtn" class="btn btn-secondary btn-sm">
                         <i class="fas fa-image"></i> Add Image
                     </button>
+                    <div class="align-menu-wrap">
+                        <button type="button" id="alignMenuBtn" class="btn btn-outline-secondary btn-sm align-menu-btn" title="Align selected fields" aria-haspopup="true" aria-expanded="false" aria-controls="alignMenuDropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div id="alignMenuDropdown" class="align-menu-dropdown" hidden role="menu">
+                            <button type="button" class="align-menu-item" data-align="left" role="menuitem">
+                                <i class="fas fa-align-left"></i> Align Left
+                            </button>
+                            <button type="button" class="align-menu-item" data-align="center" role="menuitem">
+                                <i class="fas fa-align-center"></i> Align Center
+                            </button>
+                            <button type="button" class="align-menu-item" data-align="right" role="menuitem">
+                                <i class="fas fa-align-right"></i> Align Right
+                            </button>
+                            <div class="align-menu-divider" role="separator"></div>
+                            <span class="align-menu-label">Justify (line up)</span>
+                            <button type="button" class="align-menu-item" data-justify="top" role="menuitem">
+                                <i class="fas fa-arrow-up"></i> Justify Top
+                            </button>
+                            <button type="button" class="align-menu-item" data-justify="middle" role="menuitem">
+                                <i class="fas fa-arrows-alt-v"></i> Justify Middle
+                            </button>
+                            <button type="button" class="align-menu-item" data-justify="bottom" role="menuitem">
+                                <i class="fas fa-arrow-down"></i> Justify Bottom
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <p class="placement-hint" id="placementHint" hidden>Click on the page to place the field</p>
             </section>

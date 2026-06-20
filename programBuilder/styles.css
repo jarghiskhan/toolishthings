@@ -57,6 +57,51 @@ body {
     flex: 1;
 }
 
+.global-color-row {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.global-color-row .form-control-color {
+    width: 2.5rem;
+    height: 2rem;
+    padding: 0.15rem;
+    flex-shrink: 0;
+}
+
+.global-style-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: var(--primary);
+    background: hsla(var(--primary-hsl), 0.12);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    margin-bottom: 0.35rem;
+}
+
+.field-font-color-row {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+}
+
+.field-font-color-row .form-select {
+    flex: 1;
+}
+
+.field-font-color-row .form-control-color {
+    width: 2.5rem;
+    height: 2rem;
+    padding: 0.15rem;
+    flex-shrink: 0;
+}
+
+.field-font-color-row .hex-input {
+    width: 5.5rem;
+    flex-shrink: 0;
+}
+
 .field-editors {
     flex: 1;
     overflow-y: auto;
@@ -66,10 +111,69 @@ body {
 .add-field-buttons {
     display: flex;
     gap: 0.5rem;
+    align-items: stretch;
 }
 
-.add-field-buttons .btn {
+.add-field-buttons .btn:not(.align-menu-btn) {
     flex: 1;
+}
+
+.align-menu-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.align-menu-btn {
+    height: 100%;
+    padding-left: 0.55rem;
+    padding-right: 0.55rem;
+}
+
+.align-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    min-width: 11.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
+    z-index: 20;
+    overflow: hidden;
+}
+
+.align-menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.25rem 0;
+}
+
+.align-menu-label {
+    display: block;
+    padding: 0.35rem 0.75rem 0.15rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+}
+
+.align-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.align-menu-item:hover {
+    background: var(--background);
 }
 
 .placement-hint {
@@ -105,6 +209,31 @@ body {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 0.5rem;
+    gap: 0.35rem;
+}
+
+.field-select-check {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+}
+
+.field-select-check input[type="checkbox"] {
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.field-editor.bulk-checked {
+    border-color: var(--secondary);
+}
+
+.field-editor.selected.bulk-checked {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px hsla(var(--primary-hsl), 0.25), inset 0 0 0 1px var(--secondary);
 }
 
 .field-label-badge {
@@ -235,10 +364,49 @@ body {
     border-color: hsla(var(--primary-hsl), 0.5);
 }
 
+.canvas-field.bulk-selected {
+    border-color: var(--secondary);
+    background: hsla(var(--secondary-hsl), 0.08);
+}
+
 .canvas-field.selected {
     border-color: var(--primary);
     background: hsla(var(--primary-hsl), 0.05);
+    overflow: visible;
+    z-index: 3;
 }
+
+.resize-handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border: 1px solid white;
+    border-radius: 2px;
+    box-sizing: border-box;
+    z-index: 4;
+}
+
+.resize-handle-n,
+.resize-handle-s {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.resize-handle-e,
+.resize-handle-w {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.resize-handle-n { top: -5px; cursor: n-resize; }
+.resize-handle-s { bottom: -5px; cursor: s-resize; }
+.resize-handle-e { right: -5px; cursor: e-resize; }
+.resize-handle-w { left: -5px; cursor: w-resize; }
+.resize-handle-nw { top: -5px; left: -5px; cursor: nw-resize; }
+.resize-handle-ne { top: -5px; right: -5px; cursor: ne-resize; }
+.resize-handle-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+.resize-handle-se { bottom: -5px; right: -5px; cursor: se-resize; }
 
 .canvas-field .field-label-tag {
     position: absolute;
@@ -358,5 +526,9 @@ body {
 
     .canvas-field .field-label-tag {
         display: none;
+    }
+
+    .resize-handle {
+        display: none !important;
     }
 }
