@@ -19,6 +19,9 @@ class ProgramBuilderApp {
         this.activeProjectId = localStorage.getItem('programBuilderActiveId') || null;
         this.selectedFieldId = null;
         this.checkedFieldIds = new Set();
+        this.openFieldOrderMenuId = null;
+        this.fieldOrderMenuAnchor = null;
+        this.fieldOrderMenuIgnoreClose = false;
         this.placementMode = null;
         this.pendingFieldType = null;
         this.saveTimeout = null;
@@ -40,8 +43,44 @@ class ProgramBuilderApp {
         this.placementHint = document.getElementById('placementHint');
         this.saveStatus = document.getElementById('saveStatus');
         this.storageWarning = document.getElementById('storageWarning');
+        this.fieldOrderMenu = document.getElementById('fieldOrderMenu');
+        this.fieldOrderMoveUp = document.getElementById('fieldOrderMoveUp');
+        this.fieldOrderMoveDown = document.getElementById('fieldOrderMoveDown');
+        this.fieldOrderSelect = document.getElementById('fieldOrderSelect');
 
         this.init();
+    }
+
+    initFieldOrderMenu() {
+        if (!this.fieldOrderMenu || !this.fieldOrderMoveUp) return;
+
+        this.fieldOrderMoveUp.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!this.openFieldOrderMenuId) return;
+            const fieldId = this.openFieldOrderMenuId;
+            this.closeFieldOrderMenu();
+            this.moveFieldUp(fieldId);
+        });
+
+        this.fieldOrderMoveDown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!this.openFieldOrderMenuId) return;
+            const fieldId = this.openFieldOrderMenuId;
+            this.closeFieldOrderMenu();
+            this.moveFieldDown(fieldId);
+        });
+
+        this.fieldOrderSelect.addEventListener('change', (e) => {
+            e.stopPropagation();
+            if (!this.openFieldOrderMenuId) return;
+            const fieldId = this.openFieldOrderMenuId;
+            const targetOrder = parseInt(e.target.value, 10);
+            if (!targetOrder) return;
+            this.closeFieldOrderMenu();
+            this.moveFieldToOrder(fieldId, targetOrder);
+        });
+
+        this.fieldOrderMenu.addEventListener('click', (e) => e.stopPropagation());
     }
 
     init() {
@@ -54,6 +93,7 @@ class ProgramBuilderApp {
         }
 
         this.bindEvents();
+        this.initFieldOrderMenu();
         this.renderProjectSelect();
         this.render();
         this.checkStorageSize();
@@ -218,6 +258,188 @@ class ProgramBuilderApp {
         this.renderFieldEditors();
     }
 
+    getSortedPageFields(page) {
+        return [...page.fields].sort((a, b) => a.globalOrder - b.globalOrder);
+    }
+
+    relabelPageFields(page, orderedFields) {
+        const pageLetter = page.pageLetter || this.getPageLetter(0);
+        const sorted = orderedFields || this.getSortedPageFields(page);
+        sorted.forEach((field, index) => {
+            const order = index + 1;
+            field.globalOrder = order;
+            field.label = `${pageLetter}${order}`;
+        });
+    }
+
+    applyFieldReorder() {
+        const project = this.getActiveProject();
+        if (project) project.updatedAt = new Date().toISOString();
+        this.scheduleSave();
+        this.updateCanvasFieldLabels();
+        this.renderFieldEditors();
+    }
+
+    updateCanvasFieldLabels() {
+        const page = this.getCurrentPage();
+        if (!page) return;
+
+        for (const field of page.fields) {
+            const el = this.canvasFields.querySelector(`[data-field-id="${field.id}"]`);
+            if (!el) continue;
+
+            const labelTag = el.querySelector('.field-label-tag');
+            if (labelTag) labelTag.textContent = field.label;
+
+            const textEl = el.querySelector('.canvas-field-text');
+            if (textEl && !field.content) {
+                textEl.textContent = field.label;
+            }
+        }
+    }
+
+    moveFieldUp(fieldId) {
+        const page = this.getCurrentPage();
+        if (!page) return;
+        const sorted = this.getSortedPageFields(page);
+        const index = sorted.findIndex(f => f.id === fieldId);
+        if (index <= 0) return;
+
+        [sorted[index - 1], sorted[index]] = [sorted[index], sorted[index - 1]];
+        this.relabelPageFields(page, sorted);
+        this.applyFieldReorder();
+    }
+
+    moveFieldDown(fieldId) {
+        const page = this.getCurrentPage();
+        if (!page) return;
+        const sorted = this.getSortedPageFields(page);
+        const index = sorted.findIndex(f => f.id === fieldId);
+        if (index === -1 || index >= sorted.length - 1) return;
+
+        [sorted[index], sorted[index + 1]] = [sorted[index + 1], sorted[index]];
+        this.relabelPageFields(page, sorted);
+        this.applyFieldReorder();
+    }
+
+    moveFieldToOrder(fieldId, targetOrder) {
+        const page = this.getCurrentPage();
+        if (!page) return;
+
+        const sorted = this.getSortedPageFields(page);
+        const currentIndex = sorted.findIndex(f => f.id === fieldId);
+        if (currentIndex === -1) return;
+
+        const targetIndex = targetOrder - 1;
+        if (targetIndex < 0 || targetIndex >= sorted.length || currentIndex === targetIndex) return;
+
+        const [field] = sorted.splice(currentIndex, 1);
+        sorted.splice(targetIndex, 0, field);
+        this.relabelPageFields(page, sorted);
+        this.applyFieldReorder();
+    }
+
+    closeFieldOrderMenu() {
+        if (!this.fieldOrderMenu) return;
+
+        this.openFieldOrderMenuId = null;
+        this.fieldOrderMenuAnchor = null;
+        this.fieldOrderMenu.hidden = true;
+        this.fieldOrderMenu.style.position = '';
+        this.fieldOrderMenu.style.left = '';
+        this.fieldOrderMenu.style.top = '';
+        this.fieldOrderMenu.style.visibility = '';
+
+        this.fieldEditors.querySelectorAll('.field-order-menu-btn').forEach(el => {
+            el.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    positionFieldOrderMenu(dropdown, button) {
+        const margin = 6;
+        const viewportPadding = 8;
+
+        dropdown.hidden = false;
+        dropdown.style.position = 'fixed';
+        dropdown.style.visibility = 'hidden';
+        dropdown.style.left = '0';
+        dropdown.style.top = '0';
+
+        const btnRect = button.getBoundingClientRect();
+        const dropdownRect = dropdown.getBoundingClientRect();
+
+        let left = btnRect.right + margin;
+        let top = btnRect.top;
+
+        if (left + dropdownRect.width > window.innerWidth - viewportPadding) {
+            left = window.innerWidth - dropdownRect.width - viewportPadding;
+        }
+        left = Math.max(viewportPadding, left);
+
+        if (top + dropdownRect.height > window.innerHeight - viewportPadding) {
+            top = window.innerHeight - dropdownRect.height - viewportPadding;
+        }
+        top = Math.max(viewportPadding, top);
+
+        dropdown.style.left = `${left}px`;
+        dropdown.style.top = `${top}px`;
+        dropdown.style.visibility = 'visible';
+    }
+
+    openFieldOrderMenu(fieldId, button) {
+        if (this.openFieldOrderMenuId === fieldId) {
+            this.closeFieldOrderMenu();
+            return;
+        }
+
+        this.closeAlignMenu();
+        this.closeFieldOrderMenu();
+
+        const page = this.getCurrentPage();
+        if (!page) return;
+
+        const sorted = this.getSortedPageFields(page);
+        const fieldIndex = sorted.findIndex(f => f.id === fieldId);
+        if (fieldIndex === -1) return;
+
+        this.openFieldOrderMenuId = fieldId;
+        this.fieldOrderMenuAnchor = button;
+
+        this.fieldOrderMoveUp.disabled = fieldIndex <= 0;
+        this.fieldOrderMoveDown.disabled = fieldIndex >= sorted.length - 1;
+
+        this.fieldOrderSelect.innerHTML = sorted.map((sortedField, index) => {
+            const order = index + 1;
+            const selected = sortedField.id === fieldId ? ' selected' : '';
+            return `<option value="${order}"${selected}>${this.escapeHtml(sortedField.label)}</option>`;
+        }).join('');
+
+        button.setAttribute('aria-expanded', 'true');
+        this.positionFieldOrderMenu(this.fieldOrderMenu, button);
+
+        this.fieldOrderMenuIgnoreClose = true;
+        requestAnimationFrame(() => {
+            this.fieldOrderMenuIgnoreClose = false;
+        });
+    }
+
+    createFieldOrderButton(field) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-sm btn-outline-secondary field-order-menu-btn';
+        button.title = 'Reorder field label';
+        button.setAttribute('aria-label', `Reorder ${field.label}`);
+        button.setAttribute('aria-haspopup', 'true');
+        button.setAttribute('aria-expanded', 'false');
+        button.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.openFieldOrderMenu(field.id, button);
+        });
+        return button;
+    }
+
     getCheckedFields(page) {
         const fields = [];
         for (const fieldId of this.checkedFieldIds) {
@@ -302,6 +524,7 @@ class ProgramBuilderApp {
             this.selectedFieldId = null;
             this.checkedFieldIds.clear();
             this.closeAlignMenu();
+            this.closeFieldOrderMenu();
             this.cancelPlacement();
             this.render();
         });
@@ -313,6 +536,7 @@ class ProgramBuilderApp {
             this.selectedFieldId = null;
             this.checkedFieldIds.clear();
             this.closeAlignMenu();
+            this.closeFieldOrderMenu();
             this.cancelPlacement();
             this.scheduleSave();
             this.renderProjectSelect();
@@ -331,6 +555,7 @@ class ProgramBuilderApp {
             this.selectedFieldId = null;
             this.checkedFieldIds.clear();
             this.closeAlignMenu();
+            this.closeFieldOrderMenu();
             this.cancelPlacement();
             this.scheduleSave();
             this.renderProjectSelect();
@@ -388,6 +613,7 @@ class ProgramBuilderApp {
 
         document.getElementById('alignMenuBtn').addEventListener('click', (e) => {
             e.stopPropagation();
+            this.closeFieldOrderMenu();
             this.toggleAlignMenu();
         });
 
@@ -404,9 +630,18 @@ class ProgramBuilderApp {
         });
 
         document.addEventListener('click', (e) => {
-            if (e.target.closest('.align-menu-wrap')) return;
-            this.closeAlignMenu();
+            if (this.fieldOrderMenuIgnoreClose) return;
+            if (!e.target.closest('.align-menu-wrap')) this.closeAlignMenu();
+            if (!e.target.closest('#fieldOrderMenu, .field-order-menu-btn')) {
+                this.closeFieldOrderMenu();
+            }
         });
+
+        this.fieldEditors.addEventListener('scroll', () => {
+            if (this.openFieldOrderMenuId && this.fieldOrderMenuAnchor) {
+                this.positionFieldOrderMenu(this.fieldOrderMenu, this.fieldOrderMenuAnchor);
+            }
+        }, { passive: true });
 
         document.getElementById('printBtn').addEventListener('click', () => {
             window.print();
@@ -798,6 +1033,8 @@ class ProgramBuilderApp {
     }
 
     renderFieldEditors() {
+        this.closeFieldOrderMenu();
+
         const page = this.getCurrentPage();
         const fields = page ? [...page.fields].sort((a, b) => a.globalOrder - b.globalOrder) : [];
 
@@ -806,7 +1043,7 @@ class ProgramBuilderApp {
         const existing = this.fieldEditors.querySelectorAll('.field-editor');
         existing.forEach(el => el.remove());
 
-        fields.forEach(field => {
+        fields.forEach((field, fieldIndex) => {
             const isChecked = this.checkedFieldIds.has(field.id);
             const editor = document.createElement('div');
             editor.className = `field-editor${field.id === this.selectedFieldId ? ' selected' : ''}${isChecked ? ' bulk-checked' : ''}`;
@@ -835,11 +1072,20 @@ class ProgramBuilderApp {
             checkLabel.appendChild(checkbox);
             checkLabel.appendChild(badge);
 
+            const titleGroup = document.createElement('div');
+            titleGroup.className = 'field-title-group';
+            titleGroup.appendChild(checkLabel);
+
+            const menuWrap = document.createElement('div');
+            menuWrap.className = 'field-order-menu-wrap';
+            menuWrap.appendChild(this.createFieldOrderButton(field));
+            titleGroup.appendChild(menuWrap);
+
             const typeTag = document.createElement('span');
             typeTag.className = 'field-type-tag';
             typeTag.textContent = field.type;
 
-            header.appendChild(checkLabel);
+            header.appendChild(titleGroup);
             header.appendChild(typeTag);
             editor.appendChild(header);
 
@@ -980,7 +1226,7 @@ class ProgramBuilderApp {
             editor.appendChild(deleteBtn);
 
             editor.addEventListener('click', (e) => {
-                if (e.target.closest('textarea, input, select, button, label')) return;
+                if (e.target.closest('textarea, input, select, button, label, .field-order-menu-wrap')) return;
                 this.selectField(field.id);
             });
             this.fieldEditors.appendChild(editor);
@@ -1127,6 +1373,7 @@ class ProgramBuilderApp {
                 this.selectedFieldId = null;
                 this.checkedFieldIds.clear();
                 this.closeAlignMenu();
+                this.closeFieldOrderMenu();
                 this.cancelPlacement();
                 this.scheduleSave();
                 this.renderProjectSelect();

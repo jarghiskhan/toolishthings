@@ -245,6 +245,87 @@ body {
     border-radius: 4px;
 }
 
+.field-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.field-select-check {
+    flex: 0 1 auto;
+}
+
+.field-order-menu-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.field-order-menu-btn {
+    padding: 0.15rem 0.4rem;
+    line-height: 1;
+}
+
+.field-order-menu-dropdown {
+    position: fixed;
+    min-width: 10.5rem;
+    max-width: min(14rem, calc(100vw - 1rem));
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
+    z-index: 1060;
+    padding: 0.35rem 0;
+    pointer-events: auto;
+}
+
+.field-order-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.45rem 0.75rem;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.field-order-menu-item:hover:not(:disabled) {
+    background: var(--background);
+}
+
+.field-order-menu-item:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.field-order-menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.35rem 0;
+}
+
+.field-order-menu-label {
+    display: block;
+    padding: 0.15rem 0.75rem 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.field-order-select {
+    margin: 0 0.5rem 0.35rem;
+    width: calc(100% - 1rem);
+    font-size: 0.8rem;
+}
+
 .field-type-tag {
     font-size: 0.7rem;
     color: var(--text-secondary);

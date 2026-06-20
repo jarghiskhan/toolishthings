@@ -117,6 +117,18 @@
         </main>
     </div>
 
+    <div id="fieldOrderMenu" class="field-order-menu-dropdown field-order-menu-floating" hidden role="menu">
+        <button type="button" id="fieldOrderMoveUp" class="field-order-menu-item">
+            <i class="fas fa-arrow-up"></i> Move Up
+        </button>
+        <button type="button" id="fieldOrderMoveDown" class="field-order-menu-item">
+            <i class="fas fa-arrow-down"></i> Move Down
+        </button>
+        <div class="field-order-menu-divider" role="separator"></div>
+        <label class="field-order-menu-label" for="fieldOrderSelect">Move to position</label>
+        <select id="fieldOrderSelect" class="form-select form-select-sm field-order-select" aria-label="Move field to position"></select>
+    </div>
+
     <script src="../js/shared-navbar.js"></script>
     <script src="app.js"></script>
 </body>
