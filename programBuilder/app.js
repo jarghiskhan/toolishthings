@@ -49,6 +49,9 @@ class ProgramBuilderApp {
         this.fieldOrderSelect = document.getElementById('fieldOrderSelect');
         this.fieldOrderLabelInput = document.getElementById('fieldOrderLabelInput');
         this.fieldOrderDuplicate = document.getElementById('fieldOrderDuplicate');
+        this.selectedCountBadge = document.getElementById('selectedCountBadge');
+        this.uncheckAllBtn = document.getElementById('uncheckAllBtn');
+        this.uncheckAllDivider = document.getElementById('uncheckAllDivider');
 
         this.init();
     }
@@ -247,8 +250,21 @@ class ProgramBuilderApp {
         const dropdown = document.getElementById('alignMenuDropdown');
         const button = document.getElementById('alignMenuBtn');
         const isOpen = !dropdown.hidden;
+        if (!isOpen) {
+            const hasChecked = this.checkedFieldIds.size > 0;
+            if (this.uncheckAllBtn) this.uncheckAllBtn.hidden = !hasChecked;
+            if (this.uncheckAllDivider) this.uncheckAllDivider.hidden = !hasChecked;
+        }
         dropdown.hidden = isOpen;
         button.setAttribute('aria-expanded', String(!isOpen));
+    }
+
+    uncheckAll() {
+        if (this.checkedFieldIds.size === 0) return;
+        this.checkedFieldIds.clear();
+        this.renderCanvas();
+        this.renderFieldEditors();
+        this.updateSelectedCount();
     }
 
     closeAlignMenu() {
@@ -568,6 +584,14 @@ class ProgramBuilderApp {
         }
         this.renderCanvas();
         this.updateFieldEditorSelection(fieldId);
+        this.updateSelectedCount();
+    }
+
+    updateSelectedCount() {
+        if (!this.selectedCountBadge) return;
+        const count = this.checkedFieldIds.size;
+        this.selectedCountBadge.textContent = count;
+        this.selectedCountBadge.hidden = count === 0;
     }
 
     updateFieldEditorSelection(fieldId) {
@@ -681,7 +705,9 @@ class ProgramBuilderApp {
         document.querySelectorAll('.align-menu-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (item.dataset.align) {
+                if (item.id === 'uncheckAllBtn') {
+                    this.uncheckAll();
+                } else if (item.dataset.align) {
                     this.applyBulkAlignment(item.dataset.align);
                 } else if (item.dataset.justify) {
                     this.applyBulkJustify(item.dataset.justify);
@@ -881,6 +907,8 @@ class ProgramBuilderApp {
 
         page.fields.push(clone);
         project.updatedAt = new Date().toISOString();
+        this.checkedFieldIds.clear();
+        this.checkedFieldIds.add(clone.id);
         this.selectedFieldId = clone.id;
         this.scheduleSave();
         this.render();
@@ -1180,6 +1208,7 @@ class ProgramBuilderApp {
 
         this.renderFieldEditors();
         this.renderCanvas();
+        this.updateSelectedCount();
     }
 
     renderFieldEditors() {

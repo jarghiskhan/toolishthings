@@ -57,7 +57,12 @@
                         <button type="button" id="alignMenuBtn" class="btn btn-outline-secondary btn-sm align-menu-btn" title="Align selected fields" aria-haspopup="true" aria-expanded="false" aria-controls="alignMenuDropdown">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
+                        <span id="selectedCountBadge" class="selected-count-badge" title="Selected elements" aria-live="polite" hidden>0</span>
                         <div id="alignMenuDropdown" class="align-menu-dropdown" hidden role="menu">
+                            <button type="button" id="uncheckAllBtn" class="align-menu-item" role="menuitem" hidden>
+                                <i class="fas fa-square"></i> Uncheck All
+                            </button>
+                            <div class="align-menu-divider" id="uncheckAllDivider" role="separator" hidden></div>
                             <button type="button" class="align-menu-item" data-align="left" role="menuitem">
                                 <i class="fas fa-align-left"></i> Align Left
                             </button>
