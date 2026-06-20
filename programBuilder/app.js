@@ -47,6 +47,8 @@ class ProgramBuilderApp {
         this.fieldOrderMoveUp = document.getElementById('fieldOrderMoveUp');
         this.fieldOrderMoveDown = document.getElementById('fieldOrderMoveDown');
         this.fieldOrderSelect = document.getElementById('fieldOrderSelect');
+        this.fieldOrderLabelInput = document.getElementById('fieldOrderLabelInput');
+        this.fieldOrderDuplicate = document.getElementById('fieldOrderDuplicate');
 
         this.init();
     }
@@ -80,7 +82,54 @@ class ProgramBuilderApp {
             this.moveFieldToOrder(fieldId, targetOrder);
         });
 
+        if (this.fieldOrderDuplicate) {
+            this.fieldOrderDuplicate.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!this.openFieldOrderMenuId) return;
+                const fieldId = this.openFieldOrderMenuId;
+                this.closeFieldOrderMenu();
+                this.duplicateField(fieldId);
+            });
+        }
+
+        if (this.fieldOrderLabelInput) {
+            this.fieldOrderLabelInput.addEventListener('input', (e) => {
+                if (!this.openFieldOrderMenuId) return;
+                this.setFieldName(this.openFieldOrderMenuId, e.target.value);
+            });
+            this.fieldOrderLabelInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.closeFieldOrderMenu();
+                }
+            });
+            this.fieldOrderLabelInput.addEventListener('click', (e) => e.stopPropagation());
+        }
+
         this.fieldOrderMenu.addEventListener('click', (e) => e.stopPropagation());
+    }
+
+    setFieldName(fieldId, rawName) {
+        const page = this.getCurrentPage();
+        if (!page) return;
+        const field = page.fields.find(f => f.id === fieldId);
+        if (!field) return;
+
+        const name = (rawName || '').slice(0, 40);
+        field.name = name;
+        const project = this.getActiveProject();
+        if (project) project.updatedAt = new Date().toISOString();
+        this.scheduleSave();
+
+        const nameTag = this.fieldEditors.querySelector(
+            `.field-editor[data-field-id="${fieldId}"] .field-custom-name`
+        );
+        if (nameTag) {
+            nameTag.textContent = name;
+            nameTag.hidden = !name;
+        }
+        const canvasEl = this.canvasFields.querySelector(`[data-field-id="${fieldId}"]`);
+        if (canvasEl) canvasEl.title = name;
     }
 
     init() {
@@ -126,6 +175,7 @@ class ProgramBuilderApp {
 
         for (const page of project.pages || []) {
             for (const field of page.fields || []) {
+                if (field.name === undefined) field.name = '';
                 if (field.type !== 'text') continue;
                 if (field.fontFamily === undefined) {
                     field.fontFamily = project.globalFontFamily;
@@ -138,6 +188,10 @@ class ProgramBuilderApp {
                 }
                 field.textColor = this.normalizeHexColor(field.textColor)
                     || project.globalTextColor;
+                if (field.contentFormat !== 'html') {
+                    field.content = this.plainTextToHtml(field.content || '');
+                    field.contentFormat = 'html';
+                }
             }
         }
     }
@@ -292,7 +346,7 @@ class ProgramBuilderApp {
             if (labelTag) labelTag.textContent = field.label;
 
             const textEl = el.querySelector('.canvas-field-text');
-            if (textEl && !field.content) {
+            if (textEl && !this.htmlHasContent(field.content)) {
                 textEl.textContent = field.label;
             }
         }
@@ -411,8 +465,15 @@ class ProgramBuilderApp {
         this.fieldOrderSelect.innerHTML = sorted.map((sortedField, index) => {
             const order = index + 1;
             const selected = sortedField.id === fieldId ? ' selected' : '';
-            return `<option value="${order}"${selected}>${this.escapeHtml(sortedField.label)}</option>`;
+            const optionLabel = sortedField.name
+                ? `${sortedField.label} – ${sortedField.name}`
+                : sortedField.label;
+            return `<option value="${order}"${selected}>${this.escapeHtml(optionLabel)}</option>`;
         }).join('');
+
+        if (this.fieldOrderLabelInput) {
+            this.fieldOrderLabelInput.value = sorted[fieldIndex].name || '';
+        }
 
         button.setAttribute('aria-expanded', 'true');
         this.positionFieldOrderMenu(this.fieldOrderMenu, button);
@@ -665,8 +726,70 @@ class ProgramBuilderApp {
         document.addEventListener('mouseup', () => this.handlePointerEnd());
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') this.cancelPlacement();
+            if (e.key === 'Escape') {
+                this.cancelPlacement();
+                return;
+            }
+            this.handleArrowKeyMove(e);
         });
+    }
+
+    isTextEntryTarget(target) {
+        if (!target) return false;
+        if (target.isContentEditable) return true;
+        const tag = target.tagName;
+        if (tag === 'TEXTAREA' || tag === 'SELECT') return true;
+        if (tag === 'INPUT') {
+            const type = (target.type || 'text').toLowerCase();
+            const nonText = ['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'color', 'range'];
+            return !nonText.includes(type);
+        }
+        return false;
+    }
+
+    handleArrowKeyMove(e) {
+        const directions = {
+            ArrowLeft: [-1, 0],
+            ArrowRight: [1, 0],
+            ArrowUp: [0, -1],
+            ArrowDown: [0, 1]
+        };
+        const dir = directions[e.key];
+        if (!dir) return;
+        if (this.checkedFieldIds.size === 0) return;
+        if (this.isTextEntryTarget(e.target)) return;
+
+        e.preventDefault();
+        const step = e.shiftKey ? 5 : 1;
+        this.moveCheckedFields(dir[0] * step, dir[1] * step);
+    }
+
+    moveCheckedFields(dx, dy) {
+        if (this.checkedFieldIds.size === 0) return;
+        const page = this.getCurrentPage();
+        const project = this.getActiveProject();
+        if (!page || !project) return;
+
+        let moved = false;
+        for (const fieldId of this.checkedFieldIds) {
+            const field = page.fields.find(f => f.id === fieldId);
+            if (!field) continue;
+
+            field.x = Math.max(0, Math.min(100 - field.width, field.x + dx));
+            field.y = Math.max(0, Math.min(100 - field.height, field.y + dy));
+
+            const el = this.canvasFields.querySelector(`[data-field-id="${fieldId}"]`);
+            if (el) {
+                el.style.left = `${field.x}%`;
+                el.style.top = `${field.y}%`;
+            }
+            moved = true;
+        }
+
+        if (moved) {
+            project.updatedAt = new Date().toISOString();
+            this.scheduleSave();
+        }
     }
 
     startPlacement(type) {
@@ -707,6 +830,7 @@ class ProgramBuilderApp {
         const field = {
             id: crypto.randomUUID(),
             label: `${pageLetter}${globalOrder}`,
+            name: '',
             globalOrder,
             type,
             content: '',
@@ -729,11 +853,37 @@ class ProgramBuilderApp {
         this.render();
 
         if (type === 'text') {
-            const textarea = this.fieldEditors.querySelector(
-                `.field-editor[data-field-id="${field.id}"] textarea`
+            const editable = this.fieldEditors.querySelector(
+                `.field-editor[data-field-id="${field.id}"] .rich-text-editor`
             );
-            if (textarea) textarea.focus();
+            if (editable) this.focusEditableEnd(editable);
         }
+    }
+
+    duplicateField(fieldId) {
+        const project = this.getActiveProject();
+        const page = this.getCurrentPage();
+        if (!project || !page) return;
+
+        const source = page.fields.find(f => f.id === fieldId);
+        if (!source) return;
+
+        const globalOrder = this.getNextGlobalOrder(project);
+        const pageLetter = page.pageLetter || this.getPageLetter(0);
+        const offset = 3;
+
+        const clone = JSON.parse(JSON.stringify(source));
+        clone.id = crypto.randomUUID();
+        clone.globalOrder = globalOrder;
+        clone.label = `${pageLetter}${globalOrder}`;
+        clone.x = Math.max(0, Math.min(100 - source.width, source.x + offset));
+        clone.y = Math.max(0, Math.min(100 - source.height, source.y + offset));
+
+        page.fields.push(clone);
+        project.updatedAt = new Date().toISOString();
+        this.selectedFieldId = clone.id;
+        this.scheduleSave();
+        this.render();
     }
 
     deleteField(fieldId) {
@@ -766,8 +916,8 @@ class ProgramBuilderApp {
         if (editor) {
             editor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             if (focusTextarea) {
-                const textarea = editor.querySelector('textarea');
-                if (textarea) textarea.focus();
+                const editable = editor.querySelector('.rich-text-editor');
+                if (editable) this.focusEditableEnd(editable);
             }
         }
     }
@@ -1069,8 +1219,14 @@ class ProgramBuilderApp {
             badge.className = 'field-label-badge';
             badge.textContent = field.label;
 
+            const nameTag = document.createElement('span');
+            nameTag.className = 'field-custom-name';
+            nameTag.textContent = field.name || '';
+            nameTag.hidden = !field.name;
+
             checkLabel.appendChild(checkbox);
             checkLabel.appendChild(badge);
+            checkLabel.appendChild(nameTag);
 
             const titleGroup = document.createElement('div');
             titleGroup.className = 'field-title-group';
@@ -1090,20 +1246,7 @@ class ProgramBuilderApp {
             editor.appendChild(header);
 
             if (field.type === 'text') {
-                const textarea = document.createElement('textarea');
-                textarea.className = 'form-control form-control-sm';
-                textarea.id = `field-content-${field.id}`;
-                textarea.setAttribute('aria-label', `${field.label} text content`);
-                textarea.value = field.content;
-                textarea.placeholder = 'Enter text…';
-                textarea.addEventListener('input', (e) => {
-                    this.updateField(field.id, { content: e.target.value });
-                });
-                textarea.addEventListener('focus', () => {
-                    this.selectField(field.id, { focusTextarea: true });
-                });
-                textarea.addEventListener('click', (e) => e.stopPropagation());
-                editor.appendChild(textarea);
+                editor.appendChild(this.createRichTextEditor(field));
 
                 if (field.useGlobalStyle) {
                     const badge = document.createElement('span');
@@ -1226,7 +1369,7 @@ class ProgramBuilderApp {
             editor.appendChild(deleteBtn);
 
             editor.addEventListener('click', (e) => {
-                if (e.target.closest('textarea, input, select, button, label, .field-order-menu-wrap')) return;
+                if (e.target.closest('textarea, input, select, button, label, .field-order-menu-wrap, .rich-text-wrap')) return;
                 this.selectField(field.id);
             });
             this.fieldEditors.appendChild(editor);
@@ -1251,6 +1394,86 @@ class ProgramBuilderApp {
         reader.readAsDataURL(file);
     }
 
+    createRichTextEditor(field) {
+        const wrap = document.createElement('div');
+        wrap.className = 'rich-text-wrap';
+
+        const editable = document.createElement('div');
+        editable.className = 'rich-text-editor form-control form-control-sm';
+        editable.contentEditable = 'true';
+        editable.id = `field-content-${field.id}`;
+        editable.setAttribute('role', 'textbox');
+        editable.setAttribute('aria-multiline', 'true');
+        editable.setAttribute('aria-label', `${field.label} text content`);
+        editable.dataset.placeholder = 'Enter text…';
+        editable.innerHTML = field.content || '';
+
+        const toolbar = document.createElement('div');
+        toolbar.className = 'rich-text-toolbar';
+        const commands = [
+            { cmd: 'bold', icon: 'fa-bold', label: 'Bold' },
+            { cmd: 'italic', icon: 'fa-italic', label: 'Italic' },
+            { cmd: 'underline', icon: 'fa-underline', label: 'Underline' }
+        ];
+        commands.forEach(({ cmd, icon, label }) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-outline-secondary btn-sm rich-text-btn';
+            btn.dataset.cmd = cmd;
+            btn.title = label;
+            btn.setAttribute('aria-label', label);
+            btn.setAttribute('aria-pressed', 'false');
+            btn.innerHTML = `<i class="fas ${icon}"></i>`;
+            btn.addEventListener('mousedown', (e) => e.preventDefault());
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                editable.focus();
+                document.execCommand(cmd, false, null);
+                this.syncToolbarState(toolbar);
+                this.commitRichText(field.id, editable);
+            });
+            toolbar.appendChild(btn);
+        });
+
+        editable.addEventListener('input', () => this.commitRichText(field.id, editable));
+        editable.addEventListener('focus', () => {
+            this.selectField(field.id, { focusTextarea: true });
+        });
+        editable.addEventListener('keyup', () => this.syncToolbarState(toolbar));
+        editable.addEventListener('mouseup', () => this.syncToolbarState(toolbar));
+        editable.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        });
+        editable.addEventListener('click', (e) => e.stopPropagation());
+
+        wrap.appendChild(toolbar);
+        wrap.appendChild(editable);
+        return wrap;
+    }
+
+    commitRichText(fieldId, editable) {
+        this.updateField(fieldId, {
+            content: this.sanitizeHtml(editable.innerHTML),
+            contentFormat: 'html'
+        });
+    }
+
+    syncToolbarState(toolbar) {
+        toolbar.querySelectorAll('.rich-text-btn').forEach(btn => {
+            let active = false;
+            try {
+                active = document.queryCommandState(btn.dataset.cmd);
+            } catch (err) {
+                active = false;
+            }
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', String(active));
+        });
+    }
+
     renderCanvas() {
         const page = this.getCurrentPage();
         const fields = page ? [...page.fields].sort((a, b) => a.globalOrder - b.globalOrder) : [];
@@ -1262,6 +1485,7 @@ class ProgramBuilderApp {
             const el = document.createElement('div');
             el.className = `canvas-field${field.id === this.selectedFieldId ? ' selected' : ''}${isChecked ? ' bulk-selected' : ''}`;
             el.dataset.fieldId = field.id;
+            if (field.name) el.title = field.name;
             el.style.left = `${field.x}%`;
             el.style.top = `${field.y}%`;
             el.style.width = `${field.width}%`;
@@ -1280,12 +1504,11 @@ class ProgramBuilderApp {
                 textEl.style.fontWeight = field.fontWeight;
                 textEl.style.fontFamily = this.getFieldFontFamily(field, project);
                 textEl.style.textAlign = field.textAlign;
-                textEl.style.justifyContent = field.textAlign === 'center' ? 'center' :
-                    field.textAlign === 'right' ? 'flex-end' : 'flex-start';
-                textEl.textContent = field.content || field.label;
-                if (field.content) {
+                if (this.htmlHasContent(field.content)) {
+                    textEl.innerHTML = this.sanitizeHtml(field.content);
                     textEl.style.color = this.getFieldTextColor(field, project);
                 } else {
+                    textEl.textContent = field.label;
                     textEl.style.color = '#bbb';
                 }
                 el.appendChild(textEl);
@@ -1413,6 +1636,81 @@ class ProgramBuilderApp {
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    plainTextToHtml(text) {
+        if (!text) return '';
+        return this.escapeHtml(text).replace(/\r\n|\r|\n/g, '<br>');
+    }
+
+    sanitizeStyle(style) {
+        if (!style) return '';
+        const lower = style.toLowerCase();
+        if (lower.includes('url(') || lower.includes('javascript:') ||
+            lower.includes('expression') || lower.includes('@import')) {
+            return '';
+        }
+        return style;
+    }
+
+    sanitizeHtml(html) {
+        const allowed = new Set([
+            'B', 'STRONG', 'I', 'EM', 'U', 'BR', 'SPAN', 'DIV', 'P', 'UL', 'OL', 'LI'
+        ]);
+        const template = document.createElement('template');
+        template.innerHTML = html || '';
+
+        const walk = (node) => {
+            Array.from(node.childNodes).forEach(child => {
+                if (child.nodeType === Node.COMMENT_NODE) {
+                    child.remove();
+                    return;
+                }
+                if (child.nodeType !== Node.ELEMENT_NODE) return;
+
+                if (!allowed.has(child.tagName)) {
+                    if (child.tagName === 'SCRIPT' || child.tagName === 'STYLE') {
+                        child.remove();
+                        return;
+                    }
+                    while (child.firstChild) node.insertBefore(child.firstChild, child);
+                    child.remove();
+                    return;
+                }
+
+                Array.from(child.attributes).forEach(attr => {
+                    if (attr.name.toLowerCase() === 'style') {
+                        const safe = this.sanitizeStyle(child.getAttribute('style'));
+                        if (safe) child.setAttribute('style', safe);
+                        else child.removeAttribute('style');
+                    } else {
+                        child.removeAttribute(attr.name);
+                    }
+                });
+
+                walk(child);
+            });
+        };
+
+        walk(template.content);
+        return template.innerHTML;
+    }
+
+    htmlHasContent(html) {
+        if (!html) return false;
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent.trim().length > 0 || !!tmp.querySelector('img');
+    }
+
+    focusEditableEnd(el) {
+        el.focus();
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
     }
 }
 

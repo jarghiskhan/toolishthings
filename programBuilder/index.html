@@ -125,8 +125,15 @@
             <i class="fas fa-arrow-down"></i> Move Down
         </button>
         <div class="field-order-menu-divider" role="separator"></div>
+        <button type="button" id="fieldOrderDuplicate" class="field-order-menu-item">
+            <i class="fas fa-clone"></i> Duplicate
+        </button>
+        <div class="field-order-menu-divider" role="separator"></div>
         <label class="field-order-menu-label" for="fieldOrderSelect">Move to position</label>
         <select id="fieldOrderSelect" class="form-select form-select-sm field-order-select" aria-label="Move field to position"></select>
+        <div class="field-order-menu-divider" role="separator"></div>
+        <label class="field-order-menu-label" for="fieldOrderLabelInput">Label</label>
+        <input type="text" id="fieldOrderLabelInput" class="form-control form-control-sm field-order-label-input" maxlength="40" placeholder="e.g. Song 1, Introduction" aria-label="Custom field label" spellcheck="false">
     </div>
 
     <script src="../js/shared-navbar.js"></script>
