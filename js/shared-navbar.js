@@ -103,7 +103,7 @@ class SharedNavbar {
     }
 
     highlightCurrentPage() {
-        const navLinks = document.querySelectorAll('.nav-link');
+        const navLinks = document.querySelectorAll('#navbar-placeholder .nav-link');
         navLinks.forEach(link => {
             link.classList.remove('active');
             
