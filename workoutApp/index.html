@@ -22,14 +22,17 @@
 
         <ul class="nav nav-tabs program-tabs mb-4" id="program-tabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button type="button" class="nav-link active" data-program="toolish" onclick="selectProgram('toolish')">Toolish Gains</button>
+                <button type="button" class="nav-link active" data-program="dashboard" onclick="selectProgram('dashboard')">Dashboard</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link" data-program="toolish" onclick="selectProgram('toolish')">Toolish Gains</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button type="button" class="nav-link" data-program="bodyweight" onclick="selectProgram('bodyweight')">Athletic Training</button>
             </li>
         </ul>
 
-        <div class="row">
+        <div class="row d-none" id="workout-layout">
             <div class="col-md-4 mb-4">
                 <div class="card mb-3">
                     <div class="card-body">
@@ -55,9 +58,12 @@
                     <div class="card-body">
                         <h5 class="card-title">Actions</h5>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-success" onclick="saveWorkout()">Save Progress</button>
-                            <button class="btn btn-warning" onclick="clearAllChecks()">Clear Check</button>
-                            <button class="btn btn-info" onclick="exportData()">Export Data</button>
+                            <button type="button" class="btn btn-success" onclick="saveWorkout()">Save Progress</button>
+                            <button type="button" class="btn btn-secondary" onclick="openHistory()">History</button>
+                            <button type="button" class="btn btn-warning" onclick="clearAllChecks()">Clear Check</button>
+                            <button type="button" class="btn btn-info" onclick="exportData()">Export Data</button>
+                            <button type="button" class="btn btn-outline-info" onclick="document.getElementById('import-file').click()">Import Data</button>
+                            <input type="file" id="import-file" class="d-none" accept="application/json,.json" onchange="importData(this)">
                             <a href="repCounter/index.html" class="btn btn-outline-primary">
                                 <i class="fas fa-dumbbell me-2"></i>Rep Counter
                             </a>
@@ -74,6 +80,19 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div id="dashboard-view">
+            <h2 id="dashboard-week" class="dashboard-week"></h2>
+            <div class="dashboard-legend">
+                <span class="legend-item"><span class="legend-dot push"></span>Push</span>
+                <span class="legend-item"><span class="legend-dot pull"></span>Pull</span>
+            </div>
+            <div id="dashboard-muscles" class="dashboard-grid"></div>
+            <section class="core-section" aria-labelledby="core-heading">
+                <h3 id="core-heading" class="core-heading">Core</h3>
+                <div id="dashboard-core"></div>
+            </section>
         </div>
     </div>
 
@@ -168,6 +187,18 @@
             </div>
         </div>
     </template>
+
+    <div class="modal fade" id="history-modal" tabindex="-1" aria-labelledby="history-modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="history-modal-title">Workout History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="history-modal-body"></div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="workoutData.js"></script>
